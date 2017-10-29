@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+<plugin>
+	<extension point="org.eclipse.emf.ecore.generated_package">
+		<package 
+			uri = "http://www.unimi.it/di/se/mdp/MdpDsl"
+			class = "it.unimi.di.se.mdp.mdpDsl.MdpDslPackage"
+			genModel = "model/generated/MdpDsl.genmodel" />
+	</extension>
+</plugin>

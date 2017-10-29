@@ -1,0 +1,29 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: it.unimi.di.se.mdp
+Bundle-Vendor: My Company
+Bundle-Version: 1.0.0.qualifier
+Bundle-SymbolicName: it.unimi.di.se.mdp; singleton:=true
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.eclipse.xtext,
+ org.eclipse.xtext.xbase,
+ org.eclipse.equinox.common;bundle-version="3.5.0",
+ org.eclipse.emf.ecore,
+ org.eclipse.xtext.xbase.lib;bundle-version="2.13.0",
+ org.antlr.runtime,
+ org.eclipse.xtext.util,
+ org.eclipse.emf.common,
+ org.eclipse.xtend.lib;bundle-version="2.13.0"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8
+Export-Package: it.unimi.di.se.mdp,
+ it.unimi.di.se.mdp.mdpDsl.impl,
+ it.unimi.di.se.mdp.parser.antlr,
+ it.unimi.di.se.mdp.validation,
+ it.unimi.di.se.mdp.parser.antlr.internal,
+ it.unimi.di.se.mdp.mdpDsl,
+ it.unimi.di.se.mdp.serializer,
+ it.unimi.di.se.mdp.services,
+ it.unimi.di.se.mdp.generator,
+ it.unimi.di.se.mdp.mdpDsl.util,
+ it.unimi.di.se.mdp.scoping
+Import-Package: org.apache.log4j

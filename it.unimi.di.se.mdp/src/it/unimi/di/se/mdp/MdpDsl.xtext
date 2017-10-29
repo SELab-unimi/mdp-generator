@@ -1,0 +1,50 @@
+grammar it.unimi.di.se.mdp.MdpDsl with org.eclipse.xtext.common.Terminals
+
+generate mdpDsl "http://www.unimi.it/di/se/mdp/MdpDsl"
+
+MDPModel:
+    'model' name=STRING
+    'actions' actions += Action*
+    'states' states += State*
+    'arcs' arcs += Arc*
+    'mapping' mapping += Map*;
+  
+Action:
+	name=ID;  
+
+State:
+	name=ID '{' Label += AtomicProposition* '}' initial?=('initial')? Prior += DirichletPrior*;
+
+AtomicProposition:
+	name=ID;
+	
+DirichletPrior:
+	'Dir' '~' '(' act=[Action] ',' concentration += ConcentrationParam+ ')';
+	
+ConcentrationParam:
+	'<' dst=[State] ',' alpha=DECIMAL '>';
+	
+Arc:
+	name=ID ':' '(' src=[State] ',' act=[Action]')' '->' dst=[State] ',' probability=DECIMAL;
+
+Arg:
+	name=ID ':' type=ID;
+
+Map:
+	arc=[Arc] '->' type=ActionType when=When signature=STRING (',' precondition=Precondition)? (',' postcondition=Postcondition)?;
+	
+Precondition:
+	'precondition' expression=STRING 'args' '{' args += Arg+ '}';
+	
+Postcondition:
+	'postcondition' expression=STRING 'returnType' returnType=ID;
+
+
+When:
+	'before' | 'after';
+
+ActionType:
+	'observable' | 'controllable';
+
+
+terminal DECIMAL: INT '.' INT;

@@ -1,0 +1,3 @@
+include 'it.unimi.di.se.mdp'
+include 'it.unimi.di.se.mdp.ide'
+include 'it.unimi.di.se.mdp.tests'

@@ -1,0 +1,10 @@
+.classpath
+.gradle/
+.project
+.settings
+bin/
+build/
+target/
+*-gen/
+.DS_Store
+.launch/
