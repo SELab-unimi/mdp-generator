@@ -36,7 +36,7 @@ class MdpDslGenerator extends AbstractGenerator {
 	}
 	
 	def compileJMarkovInputFile(Resource resource, HashMap<String, Integer> stateMap) '''
-		«FOR state: resource.allContents.toIterable.filter(typeof(State))» «state.name»«IF state.prior.size > 0» u«ENDIF»,«ENDFOR»
+		«FOR state: resource.allContents.toIterable.filter(typeof(State))» «state.name»«IF state.initial» i«ENDIF»«IF state.prior.size > 0» u«ENDIF»,«ENDFOR»
 		«FOR arc: resource.allContents.toIterable.filter(typeof(Arc))»
 			«arc.src.name» «arc.act.name» «arc.dst.name» «arc.probability»
 		«ENDFOR»
