@@ -49,12 +49,13 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//Map/type"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//Map/when"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//Map/signature"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//Map/Arguments"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//Map/argsCondition"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//Map/precondition"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//Map/postcondition"/>
     </genClasses>
     <genClasses ecoreClass="MdpDsl.ecore#//Precondition">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//Precondition/expression"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//Precondition/args"/>
     </genClasses>
     <genClasses ecoreClass="MdpDsl.ecore#//Postcondition">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//Postcondition/expression"/>

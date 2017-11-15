@@ -31,10 +31,10 @@ Arg:
 	name=ID ':' type=ID;
 
 Map:
-	arc=[Arc] '->' type=ActionType when=When signature=STRING (',' precondition=Precondition)? (',' postcondition=Postcondition)?;
+	arc=[Arc] '->' type=ActionType when=When signature=STRING (',' 'args' '{' Arguments += Arg+ '}')? (',' 'argsCondition' argsCondition=STRING)? (',' precondition=Precondition)? (',' postcondition=Postcondition)?;
 	
 Precondition:
-	'precondition' expression=STRING 'args' '{' args += Arg+ '}';
+	'precondition' expression=STRING;
 	
 Postcondition:
 	'postcondition' expression=STRING 'returnType' returnType=ID;

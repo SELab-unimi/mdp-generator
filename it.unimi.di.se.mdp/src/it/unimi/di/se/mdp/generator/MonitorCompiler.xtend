@@ -14,14 +14,13 @@ class MonitorCompiler {
 			afterCompiler.addEvent(map)
 		else if(map.when == WhenCompiler.BEFORE)
 			beforeCompiler.addEvent(map)
-		if(map.precondition !== null){
-			beforeCompiler.addPrecondition(map.arc.src.name, map.precondition.expression)
-			for(Arg a: map.precondition.args)
+		if(map.arguments !== null)
+			for(Arg a: map.arguments)
 				beforeCompiler.addParameter(a.name, a.type)
-		}
-		if(map.postcondition !== null){
+		if(map.precondition !== null)
+			beforeCompiler.addPrecondition(map.arc.src.name, map.precondition.expression)
+		if(map.postcondition !== null)
 			afterCompiler.addPostcondition(map.arc.src.name, map.postcondition.expression, map.postcondition.returnType)
-		}
 	}
 	
 	def compileAdvices(String signature) '''

@@ -10,7 +10,7 @@ class BeforeCompiler extends WhenCompiler {
 	var parametersType = new ArrayList<String>
 	var preconditions = new HashMap<String, String> // source state -> expression
 	
-	private final static String PRECONDITION_MSG = "*** POSTCONDITION VIOLATION ***"
+	private final static String PRECONDITION_MSG = "*** PRECONDITION VIOLATION ***"
 	
 	def addParameter(String name, String type){
 		if(!parametersName.contains(name) && !parametersType.contains(type)){
