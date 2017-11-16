@@ -16,10 +16,10 @@ class AfterCompiler extends WhenCompiler {
 	}
 	
 	override compileAdvice(String signature) '''
-		«IF !eventStates.empty || !postconditions.empty»
+		«IF !events.empty || !postconditions.empty»
 			
-			@AfterReturning(value="execution(«signature»)"«IF !returnType.empty», returning="result"«ENDIF»)
-			public void «signature.methodName»AfterAdvice(«IF !returnType.empty»«returnType» result«ENDIF») {
+			@AfterReturning(value="execution(«signature»)«IF !args.isEmpty» && args(«var i = 1»«FOR String argName: args.keySet»«IF i > 1» «ENDIF»«argName»«IF i++ < args.keySet.size», «ENDIF»«ENDFOR»)"«ENDIF»«IF !returnType.empty», returning="result"«ENDIF»)
+			public void «signature.methodName»AfterAdvice(«IF !args.isEmpty»«var i = 1»«FOR String argName: args.keySet»«IF i > 1» «ENDIF»«args.get(argName)» «argName»«IF i++ < args.keySet.size», «ENDIF»«ENDFOR»«ENDIF»«IF !returnType.empty»«returnType» result«ENDIF») {
 				«signature.compileEvent»
 				«postconditions.compileConditions(POSTCONDITION_MSG)»
 			}

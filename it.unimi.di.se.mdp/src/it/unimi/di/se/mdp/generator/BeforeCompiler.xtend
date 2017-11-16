@@ -24,7 +24,7 @@ class BeforeCompiler extends WhenCompiler {
 	}
 	
 	override compileAdvice(String signature) '''
-		«IF !eventStates.empty || !preconditions.empty»
+		«IF !events.empty || !preconditions.empty»
 			
 			@Before(value="execution(«signature.compileSignature»)«compileArgs»")
 			public void «signature.methodName»BeforeAdvice(«adviceParameters») {

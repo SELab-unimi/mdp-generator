@@ -28,7 +28,7 @@ Arc:
 	name=ID ':' '(' src=[State] ',' act=[Action]')' '->' dst=[State] ',' probability=DECIMAL;
 
 Arg:
-	name=ID ':' type=ID;
+	name=ID ':' type=STRING;
 
 Map:
 	arc=[Arc] '->' type=ActionType when=When signature=STRING (',' 'args' '{' Arguments += Arg+ '}')? (',' 'argsCondition' argsCondition=STRING)? (',' precondition=Precondition)? (',' postcondition=Postcondition)?;

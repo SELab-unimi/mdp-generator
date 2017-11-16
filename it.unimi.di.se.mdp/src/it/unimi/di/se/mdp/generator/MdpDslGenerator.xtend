@@ -53,7 +53,8 @@ class MdpDslGenerator extends AbstractGenerator {
 	def compileEventHandler(Resource resource) '''
 		package it.unimi.di.se.monitor;
 		
-		import java.util.logging.Logger;
+		import org.slf4j.Logger;
+		import org.slf4j.LoggerFactory;
 		
 		import org.aspectj.lang.annotation.After;
 		import org.aspectj.lang.annotation.AfterReturning;
@@ -66,7 +67,7 @@ class MdpDslGenerator extends AbstractGenerator {
 		public class EventHandler {
 		    
 		    private Monitor monitor = null;
-		    private static final Logger log = Logger.getLogger(EventHandler.class.getName());
+		    private static final Logger log = LoggerFactory.getLogger(EventHandler.class.getName());
 		    static final String MODEL_PATH = "src/main/resources/«resource.URI.lastSegment»";
 		    
 		    @Pointcut("execution(public static void main(..))")
@@ -85,7 +86,7 @@ class MdpDslGenerator extends AbstractGenerator {
 		    		monitor.addEvent(Event.StopEvent());
 			}
 			«FOR signature: observableMethods.keySet»
-			«observableMethods.get(signature).compileAdvices(signature)»
+				«observableMethods.get(signature).compileAdvices(signature)»
 			«ENDFOR»
 		}
 	'''
