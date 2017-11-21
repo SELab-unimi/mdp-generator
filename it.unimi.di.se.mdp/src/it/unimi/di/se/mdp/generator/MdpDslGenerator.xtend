@@ -92,6 +92,7 @@ class MdpDslGenerator extends AbstractGenerator {
 	'''
 	
 	def parseMappings(Iterable<Map> maps) {
+		resetData
 		for(Map m: maps)
 			m.parseMapping
 	}
@@ -107,6 +108,10 @@ class MdpDslGenerator extends AbstractGenerator {
 			}
 			compiler.parse(map)
 		}
+	}
+	
+	def resetData() {
+		observableMethods.clear()
 	}
 	
 }

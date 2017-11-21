@@ -12,8 +12,8 @@ abstract class WhenCompiler {
 	
 	protected static final String ARG_SEPARATOR = '#'
 	
-	var protected events = new HashMap<String, ArrayList<Map>> // src-state -> {args-condition, arc}
-	var protected args = new ArrayList<String> // list of argType#argName
+	var protected events = new HashMap<String, ArrayList<Map>> // srcState -> {argsCondition, arc, preCondition, postCondition}
+	var protected args = new ArrayList<String> // {argType#argName}
 	
 	def addEvent(Map map){
 		var state = map.arc.src.name
@@ -78,6 +78,20 @@ abstract class WhenCompiler {
 	
 	def createArgEntry(String argType, String argName) {
 		return argType + ARG_SEPARATOR + argName
+	}
+	
+	def hasPostCondition(String state) {
+		for(Map m: events.get(state))
+			if(m.postcondition !== null)
+				return true
+		return false
+	}
+	
+	def postConditionExists() {
+		for(String state: events.keySet)
+			if(state.hasPostCondition)
+				return true
+		return false
 	}
 	
 	def abstract String compileAdvice(String signature)

@@ -2,6 +2,7 @@ package it.unimi.di.se.mdp.generator
 
 import it.unimi.di.se.mdp.generator.WhenCompiler
 import java.util.HashMap
+import it.unimi.di.se.mdp.mdpDsl.Map
 
 class AfterCompiler extends WhenCompiler {
 	
@@ -19,19 +20,30 @@ class AfterCompiler extends WhenCompiler {
 		«IF !events.empty || !postconditions.empty»
 			
 			@AfterReturning(value="execution(«signature»)«IF !args.isEmpty» && args(«var i = 1»«FOR String argEntry: args»«argEntry.extractArgName»«IF i++ < args.size», «ENDIF»«ENDFOR»)"«ENDIF»«IF !returnType.empty», returning="result"«ENDIF»)
-			public void «signature.methodName»AfterAdvice(«IF !args.isEmpty»«var i = 1»«FOR String argEntry: args»«argEntry.extractArgType» «argEntry.extractArgName»«IF i++ < args.size», «ENDIF»«ENDFOR»«ENDIF»«IF !returnType.empty»«returnType» result«ENDIF») {
+			public void «signature.methodName»AfterAdvice(«IF !args.isEmpty»«var i = 1»«FOR String argEntry: args»«argEntry.extractArgType» «argEntry.extractArgName»«IF i++ < args.size», «ENDIF»«ENDFOR»«ENDIF»«IF !returnType.empty»«IF args.size > 0», «ENDIF»«returnType» result«ENDIF») {
 				«signature.compileEvent»
-				«postconditions.compileConditions(POSTCONDITION_MSG)»
+				«compilePostconditions»
 			}
 		«ENDIF»
 	'''
 	
 	def compilePostconditions() '''
-		«IF !postconditions.empty»
+		«IF postConditionExists»
+			
 			boolean condition = true;
-			«FOR state: postconditions.keySet»
-				if(monitor.currentState.getName().equals("«state»"))
-					condition &= «postconditions.get(state)»;
+			«var i = 0»
+			«FOR String state: events.keySet»
+				«IF state.hasPostCondition»
+					«IF i++ > 0»else «ENDIF»if(monitor.currentState.getName().equals("«state»")) {
+					«var j = 0»
+					«FOR Map m: events.get(state)»
+						«IF m.postcondition !== null»
+							«IF j++ > 0»    else if«ELSE»	if«ENDIF»(«m.argsCondition»)
+									condition &= «m.postcondition.expression»;
+						«ENDIF»
+					«ENDFOR»
+					}
+				«ENDIF»
 			«ENDFOR»
 			if(!condition)
 				log.severe("*** POSTCONDITION VIOLATION ***");
