@@ -10,8 +10,10 @@ abstract class WhenCompiler {
 	public final static String BEFORE = 'before'
 	public final static String AFTER = 'after'
 	
+	protected static final String ARG_SEPARATOR = '#'
+	
 	var protected events = new HashMap<String, ArrayList<Map>> // src-state -> {args-condition, arc}
-	var protected args = new HashMap<String, String> // arg-name -> arg-type
+	var protected args = new ArrayList<String> // list of argType#argName
 	
 	def addEvent(Map map){
 		var state = map.arc.src.name
@@ -25,9 +27,11 @@ abstract class WhenCompiler {
 			mapList.add(map)
 		}
 		if(map.arguments !== null)
-			for(Arg arg: map.arguments)
-				if(!args.containsKey(arg.name))
-					args.put(arg.name, arg.type)
+			for(Arg arg: map.arguments) {
+				var argEntry = createArgEntry(arg.type, arg.name)
+				if(!args.contains(argEntry))
+					args.add(argEntry)
+			}
 	}
 	
 	def methodName(String signature){
@@ -63,6 +67,18 @@ abstract class WhenCompiler {
 				log.severe("«message»");
 		«ENDIF»
 	'''
+	
+	def extractArgName(String argEntry) {
+		return argEntry.split(ARG_SEPARATOR).get(1)
+	}
+	
+	def extractArgType(String argEntry) {
+		return argEntry.split(ARG_SEPARATOR).get(0)
+	}
+	
+	def createArgEntry(String argType, String argName) {
+		return argType + ARG_SEPARATOR + argName
+	}
 	
 	def abstract String compileAdvice(String signature)
 }
