@@ -10,14 +10,16 @@ abstract class WhenCompiler {
 	public final static String AFTER = 'after'	
 	protected static final String ARG_SEPARATOR = '#'
 	
-	var protected events = new HashMap<String, ArrayList<Map>> // srcState -> {argsCondition, arc, preCondition, postCondition}
+	// events grouped by src state: srcState -> {argsCondition, arc, preCondition, postCondition}
+	var protected events = new HashMap<String, ArrayList<Map>>
+	// arg type and name are paired by position: {<parametersType[0], parametersName[0]>, ..., <parametersType[n], parametersName[n]>}
 	var protected parametersName = new ArrayList<String>
 	var protected parametersType = new ArrayList<String>
 	
 	def addEvent(Map map){
 		var state = map.arc.src.name
 		if(!events.containsKey(state)) {
-			var mapList = new ArrayList<Map>()
+			var mapList = new ArrayList<Map>
 			mapList.add(map)
 			events.put(state, mapList)
 		}
