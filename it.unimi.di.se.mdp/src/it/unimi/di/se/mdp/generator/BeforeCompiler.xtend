@@ -3,24 +3,24 @@ package it.unimi.di.se.mdp.generator
 import it.unimi.di.se.mdp.generator.WhenCompiler
 import java.util.ArrayList
 import java.util.HashMap
+import it.unimi.di.se.mdp.mdpDsl.Map
 
 class BeforeCompiler extends WhenCompiler {
 	
-	var parametersName = new ArrayList<String>
-	var parametersType = new ArrayList<String>
-	var preconditions = new HashMap<String, String> // source state -> expression
+	var preconditions = new HashMap<String, ArrayList<Map>> // srcState -> {argsCondition, arc, preCondition}
 	
 	private final static String PRECONDITION_MSG = "*** PRECONDITION VIOLATION ***"
 	
-	def addParameter(String name, String type){
-		if(!parametersName.contains(name) && !parametersType.contains(type)){
-			parametersName.add(name)
-			parametersType.add(type)	
+	def addPrecondition(String state, Map mapping){
+		var conditions = new ArrayList<Map>
+		if(!preconditions.containsKey(state)) {
+			conditions.add(mapping)
+			preconditions.put(state, conditions)
 		}
-	}
-	
-	def addPrecondition(String state, String expression){
-		preconditions.put(state, expression)
+		else {
+			conditions = preconditions.get(state)
+			conditions.add(mapping)
+		}
 	}
 	
 	override compileAdvice(String signature) '''
@@ -28,19 +28,39 @@ class BeforeCompiler extends WhenCompiler {
 			
 			@Before(value="execution(«signature.compileSignature»)«compileArgs»")
 			public void «signature.methodName»BeforeAdvice(«adviceParameters») {
-				«signature.compileEvent»
-				«preconditions.compileConditions(PRECONDITION_MSG)»
+				«compilePreConditions(PRECONDITION_MSG)»
+				«signature.compileEvents»
 			}
 		«ENDIF»
 	'''
 	
-	def compileSignature(String signature) 
-	'''«IF !parametersType.empty»«signature.qualifiedMethodName»(«FOR i: 0..< parametersType.size»«IF i>0», «ENDIF»«parametersType.get(i)»«ENDFOR»)«ENDIF»'''
+	def compilePreConditions(String message) '''
+		«IF !preconditions.keySet.isEmpty»
+					
+			boolean condition = true;
+			«var i = 0»
+			«FOR String state: preconditions.keySet»
+				«IF state.hasPreCondition»
+					«IF i++ > 0»else «ENDIF»if(monitor.currentState.getName().equals("«state»")) {
+					«var j = 0»
+					«FOR Map m: preconditions.get(state)»
+						«IF m.precondition !== null»
+							«IF j++ > 0»    else if«ELSE»	if«ENDIF»(«m.argsCondition»)
+									condition &= «m.precondition.expression»;
+						«ENDIF»
+					«ENDFOR»
+					}
+				«ENDIF»
+			«ENDFOR»
+			if(!condition)
+				log.severe("«message»");
+		«ENDIF»
+	'''
 	
-	def compileArgs()
-	'''«IF !parametersName.empty» && args(«FOR i: 0..< parametersName.size»«IF i>0», «ENDIF»«parametersName.get(i)»«ENDFOR»)«ENDIF»'''
-	
-	def adviceParameters()
-	'''«IF !parametersName.empty && !parametersType.empty»«FOR i: 0..< parametersName.size»«IF i>0», «ENDIF»«parametersType.get(i)» «parametersName.get(i)»«ENDFOR»«ENDIF»'''
-	
+	def hasPreCondition(String state) {
+		for(Map m: preconditions.get(state))
+			if(m.precondition !== null)
+				return true
+		return false
+	}	
 }

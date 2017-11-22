@@ -3,17 +3,16 @@ package it.unimi.di.se.mdp.generator
 import java.util.ArrayList
 import java.util.HashMap
 import it.unimi.di.se.mdp.mdpDsl.Map
-import it.unimi.di.se.mdp.mdpDsl.Arg
 
 abstract class WhenCompiler {
 	
 	public final static String BEFORE = 'before'
-	public final static String AFTER = 'after'
-	
+	public final static String AFTER = 'after'	
 	protected static final String ARG_SEPARATOR = '#'
 	
 	var protected events = new HashMap<String, ArrayList<Map>> // srcState -> {argsCondition, arc, preCondition, postCondition}
-	var protected args = new ArrayList<String> // {argType#argName}
+	var protected parametersName = new ArrayList<String>
+	var protected parametersType = new ArrayList<String>
 	
 	def addEvent(Map map){
 		var state = map.arc.src.name
@@ -26,12 +25,13 @@ abstract class WhenCompiler {
 			var mapList = events.get(state)
 			mapList.add(map)
 		}
-		if(map.arguments !== null)
-			for(Arg arg: map.arguments) {
-				var argEntry = createArgEntry(arg.type, arg.name)
-				if(!args.contains(argEntry))
-					args.add(argEntry)
-			}
+	}
+	
+	def addParameter(String name, String type){
+		if(!parametersName.contains(name) && !parametersType.contains(type)){
+			parametersName.add(name)
+			parametersType.add(type)	
+		}
 	}
 	
 	def methodName(String signature){
@@ -43,30 +43,28 @@ abstract class WhenCompiler {
 		return signature.substring(0, signature.indexOf("("));
 	}
 	
-	def compileEvent(String signature) '''
+	def compileEvents(String signature) '''
 		«IF !events.empty»
-			«var i = 0»
-			«FOR String state: events.keySet»
-				«FOR Map m: events.get(state)»
-					«IF i++ > 0»else «ENDIF»if(monitor.currentState.getName().equals("«state»") && «m.argsCondition»)
-						monitor.addEvent(new Event("«m.arc.name»", System.currentTimeMillis()));
-				«ENDFOR»
+		
+		«var i = 0»
+		«FOR String state: events.keySet»
+			«FOR Map m: events.get(state)»
+				«IF i++ > 0»else «ENDIF»if(monitor.currentState.getName().equals("«state»") && «m.argsCondition»)
+					monitor.addEvent(new Event("«m.arc.name»", System.currentTimeMillis()));
 			«ENDFOR»
+		«ENDFOR»
 		«ENDIF»
 	'''
 	
-	def compileConditions(HashMap<String, String> conditions, String message) '''
-		«IF !conditions.empty»
-			
-			boolean condition = true;
-			«FOR state: conditions.keySet»
-				if(monitor.currentState.getName().equals("«state»"))
-					condition &= «conditions.get(state)»;
-			«ENDFOR»
-			if(!condition)
-				log.severe("«message»");
-		«ENDIF»
-	'''
+	def compileSignature(String signature) 
+	'''«IF !parametersType.empty»«signature.qualifiedMethodName»(«FOR i: 0..< parametersType.size»«IF i>0», «ENDIF»«parametersType.get(i)»«ENDFOR»)«ENDIF»'''
+	
+	def compileArgs()
+	'''«IF !parametersName.empty» && args(«FOR i: 0..< parametersName.size»«IF i>0», «ENDIF»«parametersName.get(i)»«ENDFOR»)«ENDIF»'''
+	
+	def adviceParameters()
+	'''«IF !parametersName.empty && !parametersType.empty»«FOR i: 0..< parametersName.size»«IF i>0», «ENDIF»«parametersType.get(i)» «parametersName.get(i)»«ENDFOR»«ENDIF»'''
+	
 	
 	def extractArgName(String argEntry) {
 		return argEntry.split(ARG_SEPARATOR).get(1)
@@ -78,20 +76,6 @@ abstract class WhenCompiler {
 	
 	def createArgEntry(String argType, String argName) {
 		return argType + ARG_SEPARATOR + argName
-	}
-	
-	def hasPostCondition(String state) {
-		for(Map m: events.get(state))
-			if(m.postcondition !== null)
-				return true
-		return false
-	}
-	
-	def postConditionExists() {
-		for(String state: events.keySet)
-			if(state.hasPostCondition)
-				return true
-		return false
 	}
 	
 	def abstract String compileAdvice(String signature)
