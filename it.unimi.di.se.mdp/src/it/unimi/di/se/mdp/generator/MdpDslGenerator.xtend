@@ -11,7 +11,7 @@ import it.unimi.di.se.mdp.mdpDsl.MDPModel
 import java.util.HashMap
 import it.unimi.di.se.mdp.mdpDsl.State
 import it.unimi.di.se.mdp.mdpDsl.Arc
-import it.unimi.di.se.mdp.mdpDsl.Map
+import it.unimi.di.se.mdp.mdpDsl.ObservableMap
 
 /**
  * Generates code from your model files on save.
@@ -30,7 +30,7 @@ class MdpDslGenerator extends AbstractGenerator {
 		//fsa.generateFile("prism/" + model.name + ".sm", resource.compilePrismModel)
 		var stateMap = createStateMapping(resource.allContents.toIterable.filter(typeof(State)))
 		fsa.generateFile("jmarkov/" + model.name + ".jmdp", resource.compileJMarkovInputFile(stateMap))
-		parseMappings(resource.allContents.toIterable.filter(typeof(Map)))
+		parseMappings(resource.allContents.toIterable.filter(typeof(ObservableMap)))
 		fsa.generateFile("it/unimi/di/se/monitor/EventHandler.aj", resource.compileEventHandler)
 		
 	}
@@ -91,13 +91,13 @@ class MdpDslGenerator extends AbstractGenerator {
 		}
 	'''
 	
-	def parseMappings(Iterable<Map> maps) {
+	def parseMappings(Iterable<ObservableMap> maps) {
 		resetData
-		for(Map m: maps)
+		for(ObservableMap m: maps)
 			m.parseMapping
 	}
 	
-	def parseMapping(Map map) {
+	def parseMapping(ObservableMap map) {
 		if(map.type == OBSERVABLE){
 			var MonitorCompiler compiler
 			if(observableMethods.containsKey(map.signature))

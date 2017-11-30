@@ -1,6 +1,6 @@
 package it.unimi.di.se.mdp.generator
 
-import it.unimi.di.se.mdp.mdpDsl.Map
+import it.unimi.di.se.mdp.mdpDsl.ObservableMap
 import it.unimi.di.se.mdp.generator.BeforeCompiler
 import it.unimi.di.se.mdp.mdpDsl.Arg
 
@@ -9,10 +9,10 @@ class MonitorCompiler {
 	var beforeCompiler = new BeforeCompiler
 	var afterCompiler = new AfterCompiler
 	
-	def parse(Map map) {
-		if(map.when == WhenCompiler.AFTER)
+	def parse(ObservableMap map) {
+		if(map.when == ObservableActionCompiler.AFTER)
 			afterCompiler.addEvent(map)
-		else if(map.when == WhenCompiler.BEFORE)
+		else if(map.when == ObservableActionCompiler.BEFORE)
 			beforeCompiler.addEvent(map)
 		
 		if(map.arguments !== null)

@@ -1,18 +1,17 @@
 package it.unimi.di.se.mdp.generator
 
-import it.unimi.di.se.mdp.generator.WhenCompiler
 import java.util.ArrayList
 import java.util.HashMap
-import it.unimi.di.se.mdp.mdpDsl.Map
+import it.unimi.di.se.mdp.mdpDsl.ObservableMap
 
-class BeforeCompiler extends WhenCompiler {
+class BeforeCompiler extends ObservableActionCompiler {
 	
-	var preconditions = new HashMap<String, ArrayList<Map>> // srcState -> {argsCondition, arc, preCondition}
+	var preconditions = new HashMap<String, ArrayList<ObservableMap>> // srcState -> {argsCondition, arc, preCondition}
 	
 	private final static String PRECONDITION_MSG = "*** PRECONDITION VIOLATION ***"
 	
-	def addPrecondition(String state, Map mapping){
-		var conditions = new ArrayList<Map>
+	def addPrecondition(String state, ObservableMap mapping){
+		var conditions = new ArrayList<ObservableMap>
 		if(!preconditions.containsKey(state)) {
 			conditions.add(mapping)
 			preconditions.put(state, conditions)
@@ -43,7 +42,7 @@ class BeforeCompiler extends WhenCompiler {
 				«IF state.hasPreCondition»
 					«IF i++ > 0»else «ENDIF»if(monitor.currentState.getName().equals("«state»")) {
 					«var j = 0»
-					«FOR Map m: preconditions.get(state)»
+					«FOR ObservableMap m: preconditions.get(state)»
 						«IF m.precondition !== null»
 							«IF j++ > 0»    else if«ELSE»	if«ENDIF»(«m.argsCondition»)
 									condition &= «m.precondition.expression»;
@@ -58,7 +57,7 @@ class BeforeCompiler extends WhenCompiler {
 	'''
 	
 	def hasPreCondition(String state) {
-		for(Map m: preconditions.get(state))
+		for(ObservableMap m: preconditions.get(state))
 			if(m.precondition !== null)
 				return true
 		return false

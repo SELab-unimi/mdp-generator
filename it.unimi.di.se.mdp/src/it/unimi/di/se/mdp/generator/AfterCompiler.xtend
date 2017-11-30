@@ -1,19 +1,18 @@
 package it.unimi.di.se.mdp.generator
 
-import it.unimi.di.se.mdp.generator.WhenCompiler
-import it.unimi.di.se.mdp.mdpDsl.Map
+import it.unimi.di.se.mdp.mdpDsl.ObservableMap
 import java.util.HashMap
 import java.util.ArrayList
 
-class AfterCompiler extends WhenCompiler {
+class AfterCompiler extends ObservableActionCompiler {
 	
 	var returnType = ''
-	var postconditions = new HashMap<String, ArrayList<Map>> // srcState -> {argsCondition, arc, postCondition}
+	var postconditions = new HashMap<String, ArrayList<ObservableMap>> // srcState -> {argsCondition, arc, postCondition}
 	
 	private final static String POSTCONDITION_MSG = "*** POSTCONDITION VIOLATION ***"
 	
-	def addPostcondition(String state, Map mapping){
-		var conditions = new ArrayList<Map>
+	def addPostcondition(String state, ObservableMap mapping){
+		var conditions = new ArrayList<ObservableMap>
 		if(!postconditions.containsKey(state)) {
 			conditions.add(mapping)
 			postconditions.put(state, conditions)
@@ -46,7 +45,7 @@ class AfterCompiler extends WhenCompiler {
 				«IF state.hasPostCondition»
 					«IF i++ > 0»else «ENDIF»if(monitor.currentState.getName().equals("«state»")) {
 					«var j = 0»
-					«FOR Map m: postconditions.get(state)»
+					«FOR ObservableMap m: postconditions.get(state)»
 						«IF m.postcondition !== null»
 							«IF j++ > 0»    else if«ELSE»	if«ENDIF»(«m.argsCondition»)
 									condition &= «m.postcondition.expression»;
@@ -61,7 +60,7 @@ class AfterCompiler extends WhenCompiler {
 	'''
 	
 	def hasPostCondition(String state) {
-		for(Map m: postconditions.get(state))
+		for(ObservableMap m: postconditions.get(state))
 			if(m.postcondition !== null)
 				return true
 		return false

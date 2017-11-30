@@ -2,24 +2,24 @@ package it.unimi.di.se.mdp.generator
 
 import java.util.ArrayList
 import java.util.HashMap
-import it.unimi.di.se.mdp.mdpDsl.Map
+import it.unimi.di.se.mdp.mdpDsl.ObservableMap
 
-abstract class WhenCompiler {
+abstract class ObservableActionCompiler {
 	
 	public final static String BEFORE = 'before'
 	public final static String AFTER = 'after'	
 	protected static final String ARG_SEPARATOR = '#'
 	
 	// events grouped by src state: srcState -> {argsCondition, arc, preCondition, postCondition}
-	var protected events = new HashMap<String, ArrayList<Map>>
+	var protected events = new HashMap<String, ArrayList<ObservableMap>>
 	// arg type and name are paired by position: {<parametersType[0], parametersName[0]>, ..., <parametersType[n], parametersName[n]>}
 	var protected parametersName = new ArrayList<String>
 	var protected parametersType = new ArrayList<String>
 	
-	def addEvent(Map map){
+	def addEvent(ObservableMap map){
 		var state = map.arc.src.name
 		if(!events.containsKey(state)) {
-			var mapList = new ArrayList<Map>
+			var mapList = new ArrayList<ObservableMap>
 			mapList.add(map)
 			events.put(state, mapList)
 		}
@@ -50,7 +50,7 @@ abstract class WhenCompiler {
 		
 		«var i = 0»
 		«FOR String state: events.keySet»
-			«FOR Map m: events.get(state)»
+			«FOR ObservableMap m: events.get(state)»
 				«IF i++ > 0»else «ENDIF»if(monitor.currentState.getName().equals("«state»") && «m.argsCondition»)
 					monitor.addEvent(new Event("«m.arc.name»", System.currentTimeMillis()));
 			«ENDFOR»
