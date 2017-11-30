@@ -4,7 +4,7 @@ import it.unimi.di.se.mdp.mdpDsl.ObservableMap
 import it.unimi.di.se.mdp.generator.BeforeCompiler
 import it.unimi.di.se.mdp.mdpDsl.Arg
 
-class MonitorCompiler {
+class MonitorObserveCompiler {
 	
 	var beforeCompiler = new BeforeCompiler
 	var afterCompiler = new AfterCompiler

@@ -12,6 +12,7 @@ import java.util.HashMap
 import it.unimi.di.se.mdp.mdpDsl.State
 import it.unimi.di.se.mdp.mdpDsl.Arc
 import it.unimi.di.se.mdp.mdpDsl.ObservableMap
+import it.unimi.di.se.mdp.mdpDsl.ControllableMap
 
 /**
  * Generates code from your model files on save.
@@ -23,17 +24,20 @@ class MdpDslGenerator extends AbstractGenerator {
 	public final static String OBSERVABLE = 'observable'
 	public final static String CONTROLLABLE = 'controllable'
 	
-	var observableMethods = new HashMap<String, MonitorCompiler>()
+	var observableMethods = new HashMap<String, MonitorObserveCompiler>()
+	var controllableActions = new HashMap<String, MonitorControlCompiler>
 
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
 		var model = resource.allContents.toIterable.filter(typeof(MDPModel)).findFirst[it !== null]
 		//fsa.generateFile("prism/" + model.name + ".sm", resource.compilePrismModel)
 		var stateMap = createStateMapping(resource.allContents.toIterable.filter(typeof(State)))
 		fsa.generateFile("jmarkov/" + model.name + ".jmdp", resource.compileJMarkovInputFile(stateMap))
-		parseMappings(resource.allContents.toIterable.filter(typeof(ObservableMap)))
-		fsa.generateFile("it/unimi/di/se/monitor/EventHandler.aj", resource.compileEventHandler)
-		
+		resetData
+		parseObserveMappings(resource.allContents.toIterable.filter(typeof(ObservableMap)))
+		parseControlMappings(resource.allContents.toIterable.filter(typeof(ControllableMap)))
+		fsa.generateFile("it/unimi/di/se/monitor/EventHandler.aj", resource.compileEventHandler)	
 	}
+	
 	
 	def HashMap<String, Integer> createStateMapping(Iterable<State> states) {
 		var result = new HashMap<String, Integer>()
@@ -91,27 +95,42 @@ class MdpDslGenerator extends AbstractGenerator {
 		}
 	'''
 	
-	def parseMappings(Iterable<ObservableMap> maps) {
-		resetData
+	def parseObserveMappings(Iterable<ObservableMap> maps) {
 		for(ObservableMap m: maps)
-			m.parseMapping
+			m.parseObserveMapping
 	}
 	
-	def parseMapping(ObservableMap map) {
-		if(map.type == OBSERVABLE){
-			var MonitorCompiler compiler
-			if(observableMethods.containsKey(map.signature))
-				compiler = observableMethods.get(map.signature)
-			else {
-				compiler = new MonitorCompiler
-				observableMethods.put(map.signature, compiler)
-			}
-			compiler.parse(map)
+	def parseObserveMapping(ObservableMap map) {
+		var MonitorObserveCompiler compiler
+		if(observableMethods.containsKey(map.signature))
+			compiler = observableMethods.get(map.signature)
+		else {
+			compiler = new MonitorObserveCompiler
+			observableMethods.put(map.signature, compiler)
 		}
+		compiler.parse(map)
+	}
+	
+	def parseControlMappings(Iterable<ControllableMap> maps) {
+		for(ControllableMap m: maps)
+			m.parseControlMapping
+	}
+	
+	def parseControlMapping(ControllableMap map) {
+		var MonitorControlCompiler compiler
+		if(controllableActions.containsKey(map.signature))
+			compiler = controllableActions.get(map.signature)
+		else {
+			compiler = new MonitorControlCompiler
+			controllableActions.put(map.signature, compiler)
+		}
+		
+		// TODO compiler.parse(map)
 	}
 	
 	def resetData() {
-		observableMethods.clear()
+		observableMethods.clear
+		controllableActions.clear
 	}
 	
 }
