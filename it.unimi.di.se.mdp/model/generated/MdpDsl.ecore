@@ -13,6 +13,8 @@
         eType="#//ObservableMap" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="controllableActions" upperBound="-1"
         eType="#//ControllableMap" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="resetActions" upperBound="-1"
+        eType="#//ResetEvent" containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Action">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
@@ -73,5 +75,11 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="signature" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="Arguments" upperBound="-1"
         eType="#//Arg" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="ResetEvent">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="signature" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="Arguments" upperBound="-1"
+        eType="#//Arg" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="argsCondition" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
 </ecore:EPackage>

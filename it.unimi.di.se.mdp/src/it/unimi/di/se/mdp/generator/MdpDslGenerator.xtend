@@ -13,6 +13,10 @@ import it.unimi.di.se.mdp.mdpDsl.State
 import it.unimi.di.se.mdp.mdpDsl.Arc
 import it.unimi.di.se.mdp.mdpDsl.ObservableMap
 import it.unimi.di.se.mdp.mdpDsl.ControllableMap
+import java.util.ArrayList
+import it.unimi.di.se.mdp.mdpDsl.ResetEvent
+import it.unimi.di.se.mdp.mdpDsl.Arg
+import java.util.List
 
 /**
  * Generates code from your model files on save.
@@ -26,6 +30,7 @@ class MdpDslGenerator extends AbstractGenerator {
 	
 	var observableMethods = new HashMap<String, MonitorObserveCompiler>()
 	var controllableActions = new HashMap<String, MonitorControlCompiler>
+	var resetActions = new ArrayList<ResetEvent>
 
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
 		var model = resource.allContents.toIterable.filter(typeof(MDPModel)).findFirst[it !== null]
@@ -35,6 +40,7 @@ class MdpDslGenerator extends AbstractGenerator {
 		resetData
 		parseObserveMappings(resource.allContents.toIterable.filter(typeof(ObservableMap)))
 		parseControlMappings(resource.allContents.toIterable.filter(typeof(ControllableMap)))
+		parseResetEvents(resource.allContents.toIterable.filter(typeof(ResetEvent)))
 		fsa.generateFile("it/unimi/di/se/monitor/EventHandler.aj", resource.compileEventHandler)	
 	}
 	
@@ -60,8 +66,23 @@ class MdpDslGenerator extends AbstractGenerator {
 		import org.slf4j.Logger;
 		import org.slf4j.LoggerFactory;
 		
+		import it.unimi.di.se.monitor.Monitor.CheckPoint;
+		import jmarkov.basic.DecisionRule;
+		import jmarkov.basic.exceptions.SolverException;
+		import jmarkov.jmdp.CharAction;
+		import jmarkov.jmdp.IntegerState;
+		import jmarkov.jmdp.SimpleMDP;
+		import jmarkov.jmdp.solvers.ProbabilitySolver;
+		
+		import java.io.BufferedReader;
+		import java.io.ByteArrayInputStream;
+		import java.io.FileNotFoundException;
+		import java.io.FileReader;
+		
+		import org.aspectj.lang.ProceedingJoinPoint;
 		import org.aspectj.lang.annotation.After;
 		import org.aspectj.lang.annotation.AfterReturning;
+		import org.aspectj.lang.annotation.Around;
 		import org.aspectj.lang.annotation.Aspect;
 		import org.aspectj.lang.annotation.Before;
 		import org.aspectj.lang.annotation.Pointcut;
@@ -70,15 +91,29 @@ class MdpDslGenerator extends AbstractGenerator {
 		@Aspect
 		public class EventHandler {
 		    
-		    private Monitor monitor = null;
 		    private static final Logger log = LoggerFactory.getLogger(EventHandler.class.getName());
 		    static final String MODEL_PATH = "src/main/resources/«resource.URI.lastSegment»";
+		    static private final String JMDP_MODEL_PATH = "src/main/resources/«resource.URI.lastSegment.split("\\.").get(0)».jmdp";
+		    
+		    private Monitor monitor = null;
+		    private SimpleMDP mdp = null;
+		    private DecisionRule<IntegerState, CharAction> decisionRule = null;
 		    
 		    @Pointcut("execution(public static void main(..))")
 		    void mainMethod() {}
 		    
 		    @Before(value="mainMethod()")
-		    public void initMonitor(){
+		    public void initMonitor() {
+		    		log.info("MDP Policy computation...");
+				try {
+					mdp = new SimpleMDP(new BufferedReader(new FileReader(JMDP_MODEL_PATH)));
+					mdp.printSolution();
+					decisionRule = mdp.getOptimalPolicy().getDecisionRule();
+					ProbabilitySolver<IntegerState, CharAction> solver = new ProbabilitySolver<>(mdp, decisionRule);
+					solver.solve();
+				} catch (FileNotFoundException|SolverException e) {
+					e.printStackTrace();
+				}
 		    		log.info("Monitor initialization...");
 		    		monitor = new Monitor();
 		    		monitor.launch();
@@ -87,13 +122,61 @@ class MdpDslGenerator extends AbstractGenerator {
 		    @After(value="mainMethod()")
 		    public void shutdownMonitor(){
 		    		log.info("Shutting down Monitor...");
-		    		monitor.addEvent(Event.StopEvent());
+		    		monitor.addEvent(Event.stopEvent());
 			}
+			
+			private String getActionFromPolicy() {			
+				monitor.addEvent(Event.readStateEvent());
+				String stateName = CheckPoint.getInstance().join(Thread.currentThread());
+				
+				CharAction action = decisionRule.getAction(new IntegerState(Integer.parseInt(stateName.substring(1))));		
+				log.info("Selected action = " + action.actionLabel());	
+				return String.valueOf(action.actionLabel());
+			}
+			
+			«IF !resetActions.isEmpty»
+				«FOR event: resetActions»
+					«compileResetEvent(event)»
+				«ENDFOR»
+			«ENDIF»
+			
 			«FOR signature: observableMethods.keySet»
 				«observableMethods.get(signature).compileAdvices(signature)»
 			«ENDFOR»
+			
+			«FOR signature: controllableActions.keySet»
+				«controllableActions.get(signature).compileAdvice(signature)»
+			«ENDFOR»
 		}
 	'''
+		
+	def compileResetEvent(ResetEvent event) '''
+		«var parametersType = new ArrayList<String>»
+		«var parametersName = new ArrayList<String>»
+		«IF event.arguments !== null && !event.arguments.isEmpty»
+			«FOR Arg arg: event.arguments»
+				«parametersType.add(arg.type)»
+				«parametersName.add(arg.name)»
+			«ENDFOR»
+		«ENDIF»
+		@Before(value="execution(«event.signature.compileSignature(parametersType)»)«parametersName.compileArgs»")
+		public void «event.signature.methodName»ResetEvent(«adviceParameters(parametersName, parametersType)») {
+			«IF event.argsCondition !== null && !event.argsCondition.isEmpty»
+			if(«event.argsCondition») {
+				log.info("Reset initial state...");
+				monitor.addEvent(Event.resetEvent());
+			}
+			«ELSE»
+			log.info("Reset initial state...");
+			monitor.addEvent(Event.resetEvent());
+			«ENDIF»
+		}
+	'''
+	
+	def parseResetEvents(Iterable<ResetEvent> events) {
+		for(ResetEvent e: events)
+			resetActions.add(e)
+	}
 	
 	def parseObserveMappings(Iterable<ObservableMap> maps) {
 		for(ObservableMap m: maps)
@@ -124,13 +207,31 @@ class MdpDslGenerator extends AbstractGenerator {
 			compiler = new MonitorControlCompiler
 			controllableActions.put(map.signature, compiler)
 		}
-		
-		// TODO compiler.parse(map)
+		compiler.parse(map)
 	}
 	
 	def resetData() {
 		observableMethods.clear
 		controllableActions.clear
+		resetActions.clear
+	}
+	
+	def compileSignature(String signature, List<String> parametersType) 
+	'''«signature.qualifiedMethodName»(«IF !parametersType.empty»«FOR i: 0..< parametersType.size»«IF i>0», «ENDIF»«parametersType.get(i)»«ENDFOR»«ENDIF»)'''
+	
+	def compileArgs(List<String> parametersName)
+	'''«IF !parametersName.empty» && args(«FOR i: 0..< parametersName.size»«IF i>0», «ENDIF»«parametersName.get(i)»«ENDFOR»)«ENDIF»'''
+	
+	def adviceParameters(List<String> parametersName, List<String> parametersType)
+	'''«IF !parametersName.empty && !parametersType.empty»«FOR i: 0..< parametersName.size»«IF i>0», «ENDIF»«parametersType.get(i)» «parametersName.get(i)»«ENDFOR»«ENDIF»'''
+	
+	def qualifiedMethodName(String signature){
+		return signature.substring(0, signature.indexOf("("));
+	}
+	
+	def methodName(String signature){
+		var method = signature.qualifiedMethodName
+		return method.substring(method.lastIndexOf(".")+1)
 	}
 	
 }

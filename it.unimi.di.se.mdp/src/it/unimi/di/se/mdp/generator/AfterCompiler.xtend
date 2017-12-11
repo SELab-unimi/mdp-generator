@@ -55,7 +55,7 @@ class AfterCompiler extends ObservableActionCompiler {
 				«ENDIF»
 			«ENDFOR»
 			if(!condition)
-				log.severe("«message»");
+				log.error("«message»");
 		«ENDIF»
 	'''
 	

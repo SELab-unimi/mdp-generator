@@ -8,7 +8,8 @@ MDPModel:
     'states' states += State*
     'arcs' arcs += Arc*
     'observe' observableActions += ObservableMap*
-    'control' controllableActions += ControllableMap*;
+    'control' controllableActions += ControllableMap*
+    'reset' resetActions += ResetEvent*;
   
 Action:
 	name=ID;  
@@ -50,5 +51,7 @@ ActionType:
 ControllableMap:
 	state=[State] '->' signature=STRING ',' 'args' '{' Arguments += Arg+ '}'; // it assumes presence the of one java.io.InputStream argument
 
+ResetEvent:
+	signature=STRING (',' 'args' '{' Arguments += Arg+ '}')? (',' 'argsCondition' argsCondition=STRING)?;
 
 terminal DECIMAL: INT '.' INT;

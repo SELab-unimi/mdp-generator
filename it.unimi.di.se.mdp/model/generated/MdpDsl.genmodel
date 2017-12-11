@@ -13,6 +13,7 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//MDPModel/arcs"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//MDPModel/observableActions"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//MDPModel/controllableActions"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//MDPModel/resetActions"/>
     </genClasses>
     <genClasses ecoreClass="MdpDsl.ecore#//Action">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//Action/name"/>
@@ -66,6 +67,11 @@
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//ControllableMap/state"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//ControllableMap/signature"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//ControllableMap/Arguments"/>
+    </genClasses>
+    <genClasses ecoreClass="MdpDsl.ecore#//ResetEvent">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//ResetEvent/signature"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//ResetEvent/Arguments"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//ResetEvent/argsCondition"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>
