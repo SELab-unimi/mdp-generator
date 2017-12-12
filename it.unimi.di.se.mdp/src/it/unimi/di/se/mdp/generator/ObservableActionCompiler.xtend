@@ -51,8 +51,8 @@ abstract class ObservableActionCompiler {
 		«var i = 0»
 		«FOR String state: events.keySet»
 			«FOR ObservableMap m: events.get(state)»
-				«IF i++ > 0»else «ENDIF»if(monitor.currentState.getName().equals("«state»") && «m.argsCondition»)
-					monitor.addEvent(new Event("«m.arc.name»", System.currentTimeMillis()));
+				«IF i++ > 0»else «ENDIF»if(currentMonitorState.equals("«state»") && «m.argsCondition»)
+					monitor.addEvent(new Event("«m.arc.name»", timeStamp));
 			«ENDFOR»
 		«ENDFOR»
 		«ENDIF»

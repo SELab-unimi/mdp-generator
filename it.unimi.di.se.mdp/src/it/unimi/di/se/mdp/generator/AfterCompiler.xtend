@@ -30,6 +30,12 @@ class AfterCompiler extends ObservableActionCompiler {
 			
 			@AfterReturning(value="execution(«signature.compileSignature»)«compileArgs»"«IF !returnType.empty», returning="result"«ENDIF»)
 			public void «signature.methodName»AfterAdvice(«adviceParameters»«IF !returnType.empty»«IF !parametersName.empty», «ENDIF»«returnType» result«ENDIF») {
+				
+				long timeStamp = System.currentTimeMillis();
+				monitor.addEvent(Event.readStateEvent());
+				String currentMonitorState = CheckPoint.getInstance().join(Thread.currentThread());		
+				log.info("Transition : " + currentMonitorState + "-->" + state.label());
+				
 				«signature.compileEvents»
 				«compilePostconditions(POSTCONDITION_MSG)»
 			}

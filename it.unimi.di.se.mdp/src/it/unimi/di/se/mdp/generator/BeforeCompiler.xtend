@@ -27,6 +27,12 @@ class BeforeCompiler extends ObservableActionCompiler {
 			
 			@Before(value="execution(«signature.compileSignature»)«compileArgs»")
 			public void «signature.methodName»BeforeAdvice(«adviceParameters») {
+				
+				long timeStamp = System.currentTimeMillis();
+				monitor.addEvent(Event.readStateEvent());
+				String currentMonitorState = CheckPoint.getInstance().join(Thread.currentThread());		
+				log.info("Transition : " + currentMonitorState + "-->" + state.label());
+				
 				«compilePreConditions(PRECONDITION_MSG)»
 				«signature.compileEvents»
 			}
@@ -40,7 +46,7 @@ class BeforeCompiler extends ObservableActionCompiler {
 			«var i = 0»
 			«FOR String state: preconditions.keySet»
 				«IF state.hasPreCondition»
-					«IF i++ > 0»else «ENDIF»if(monitor.currentState.getName().equals("«state»")) {
+					«IF i++ > 0»else «ENDIF»if(currentMonitorState.equals("«state»")) {
 					«var j = 0»
 					«FOR ObservableMap m: preconditions.get(state)»
 						«IF m.precondition !== null»

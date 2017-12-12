@@ -122,6 +122,7 @@ class MdpDslGenerator extends AbstractGenerator {
 		    @After(value="mainMethod()")
 		    public void shutdownMonitor(){
 		    		log.info("Shutting down Monitor...");
+		    		monitor.report();
 		    		monitor.addEvent(Event.stopEvent());
 			}
 			
