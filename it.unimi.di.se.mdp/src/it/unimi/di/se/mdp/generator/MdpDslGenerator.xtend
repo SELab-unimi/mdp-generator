@@ -17,6 +17,7 @@ import java.util.ArrayList
 import it.unimi.di.se.mdp.mdpDsl.ResetEvent
 import it.unimi.di.se.mdp.mdpDsl.Arg
 import java.util.List
+import java.util.AbstractMap.SimpleEntry
 
 /**
  * Generates code from your model files on save.
@@ -24,17 +25,14 @@ import java.util.List
  * See https://www.eclipse.org/Xtext/documentation/303_runtime_concepts.html#code-generation
  */
 class MdpDslGenerator extends AbstractGenerator {
-	
-	public final static String OBSERVABLE = 'observable'
-	public final static String CONTROLLABLE = 'controllable'
-	
+		
 	var observableMethods = new HashMap<String, MonitorObserveCompiler>()
 	var controllableActions = new HashMap<String, MonitorControlCompiler>
 	var resetActions = new ArrayList<ResetEvent>
 
 	override void doGenerate(Resource resource, IFileSystemAccess2 fsa, IGeneratorContext context) {
 		var model = resource.allContents.toIterable.filter(typeof(MDPModel)).findFirst[it !== null]
-		//fsa.generateFile("prism/" + model.name + ".sm", resource.compilePrismModel)
+		fsa.generateFile("prism/" + model.name + ".prism", resource.compilePrismModel)
 		var stateMap = createStateMapping(resource.allContents.toIterable.filter(typeof(State)))
 		fsa.generateFile("jmarkov/" + model.name + ".jmdp", resource.compileJMarkovInputFile(stateMap))
 		resetData
@@ -44,6 +42,53 @@ class MdpDslGenerator extends AbstractGenerator {
 		fsa.generateFile("it/unimi/di/se/monitor/EventHandler.aj", resource.compileEventHandler)	
 	}
 	
+	def compilePrismModel(Resource resource) '''
+		mdp
+		
+		module sutModel
+		
+			«compileStates(resource.allContents.toIterable.filter(typeof(State)))»
+			
+			«compileTransitions(resource.allContents.toIterable.filter(typeof(Arc)), createActionMap(resource.allContents.toIterable.filter(typeof(Arc))))»	
+			
+		endmodule
+	'''
+	
+	def compileStates(Iterable<State> states) '''
+		s : [0..«states.size-1»] init «initialState(states)»;
+	'''
+	
+	def initialState(Iterable<State> states) {
+		for(State s: states)
+			if(s.initial)
+				return indexOf(s.name)
+		return 0
+	}
+	
+	def indexOf(String stateName) {
+		return Integer.parseInt(stateName.substring(1))
+	}
+	
+	def compileTransitions(Iterable<Arc> arcs, HashMap<SimpleEntry<Integer, String>, ArrayList<Arc>> actionMap) '''
+		«FOR SimpleEntry<Integer, String> entry: actionMap.keySet»
+		[«entry.value»] s=«entry.key»«FOR Arc a: actionMap.get(entry) BEFORE ' -> ' SEPARATOR ' + ' AFTER ';'»«a.probability»:(s'=«indexOf(a.dst.name)»)«ENDFOR»
+		«ENDFOR»
+	'''
+	
+	def createActionMap(Iterable<Arc> arcs) {
+		var actionMap = new HashMap<SimpleEntry<Integer, String>, ArrayList<Arc>>
+		for(Arc a: arcs) {
+			var entry = new SimpleEntry<Integer, String>(indexOf(a.src.name), a.act.name)
+			if(actionMap.containsKey(entry))
+				actionMap.get(entry).add(a)
+			else {
+				var arcList = new ArrayList<Arc>
+				arcList.add(a)
+				actionMap.put(entry, arcList)
+			}
+		}
+		return actionMap
+	}
 	
 	def HashMap<String, Integer> createStateMapping(Iterable<State> states) {
 		var result = new HashMap<String, Integer>()

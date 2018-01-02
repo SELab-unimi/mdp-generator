@@ -14,7 +14,7 @@ MDPModel:
 Action:
 	name=ID;  
 
-State:
+State: // state naming convention is S<n>, n>=0
 	name=ID '{' Label += AtomicProposition* '}' initial?=('initial')? Prior += DirichletPrior*;
 
 AtomicProposition:
@@ -33,7 +33,7 @@ Arg:
 	name=ID ':' type=STRING;
 
 ObservableMap:
-	arc=[Arc] '->' type=ActionType when=When signature=STRING (',' 'args' '{' Arguments += Arg+ '}')? (',' 'argsCondition' argsCondition=STRING)? (',' precondition=Precondition)? (',' postcondition=Postcondition)?;
+	arc=[Arc] '->' when=When signature=STRING (',' 'args' '{' Arguments += Arg+ '}')? (',' 'argsCondition' argsCondition=STRING)? (',' precondition=Precondition)? (',' postcondition=Postcondition)?;
 	
 Precondition:
 	'precondition' expression=STRING;
@@ -41,12 +41,8 @@ Precondition:
 Postcondition:
 	'postcondition' expression=STRING 'returnType' returnType=ID;
 
-
 When:
 	'before' | 'after';
-
-ActionType:
-	'observable' | 'controllable';
 
 ControllableMap:
 	state=[State] '->' signature=STRING ',' 'args' '{' Arguments += Arg+ '}'; // it assumes presence the of one java.io.InputStream argument

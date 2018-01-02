@@ -48,7 +48,6 @@
     </genClasses>
     <genClasses ecoreClass="MdpDsl.ecore#//ObservableMap">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//ObservableMap/arc"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//ObservableMap/type"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//ObservableMap/when"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//ObservableMap/signature"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//ObservableMap/Arguments"/>
