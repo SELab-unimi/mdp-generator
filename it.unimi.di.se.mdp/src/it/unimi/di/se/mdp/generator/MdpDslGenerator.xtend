@@ -18,6 +18,9 @@ import it.unimi.di.se.mdp.mdpDsl.ResetEvent
 import it.unimi.di.se.mdp.mdpDsl.Arg
 import java.util.List
 import java.util.AbstractMap.SimpleEntry
+import org.eclipse.emf.common.util.EList
+import it.unimi.di.se.mdp.mdpDsl.AtomicProposition
+import java.util.Iterator
 
 /**
  * Generates code from your model files on save.
@@ -47,21 +50,27 @@ class MdpDslGenerator extends AbstractGenerator {
 		
 		module sutModel
 		
-			«compileStates(resource.allContents.toIterable.filter(typeof(State)))»
+			«compileStates(resource.allContents.toIterable.filter(typeof(State)).clone)»
 			
-			«compileTransitions(resource.allContents.toIterable.filter(typeof(Arc)), createActionMap(resource.allContents.toIterable.filter(typeof(Arc))))»	
+			«compileTransitions(resource.allContents.toIterable.filter(typeof(Arc)), createActionMap(resource.allContents.toIterable.filter(typeof(Arc))), createStateMap(resource.allContents.toIterable.filter(typeof(State))))»	
 			
 		endmodule
 	'''
 	
-	def compileStates(Iterable<State> states) '''
+	def compileStates(State[] states) '''
 		s : [0..«states.size-1»] init «initialState(states)»;
+		«FOR s: states»
+			«FOR p: s.label»
+				«p.name» : bool init «IF indexOf(s.name) == initialState(states)»true«ELSE»false«ENDIF»;
+			«ENDFOR»
+		«ENDFOR»
 	'''
 	
-	def initialState(Iterable<State> states) {
-		for(State s: states)
+	def initialState(State[] states) {
+		for(State s: states) {
 			if(s.initial)
 				return indexOf(s.name)
+		}
 		return 0
 	}
 	
@@ -69,11 +78,20 @@ class MdpDslGenerator extends AbstractGenerator {
 		return Integer.parseInt(stateName.substring(1))
 	}
 	
-	def compileTransitions(Iterable<Arc> arcs, HashMap<SimpleEntry<Integer, String>, ArrayList<Arc>> actionMap) '''
+	def compileTransitions(Iterable<Arc> arcs, HashMap<SimpleEntry<Integer, String>, ArrayList<Arc>> actionMap, HashMap<Integer, State> stateMap) '''
 		«FOR SimpleEntry<Integer, String> entry: actionMap.keySet»
-		[«entry.value»] s=«entry.key»«FOR Arc a: actionMap.get(entry) BEFORE ' -> ' SEPARATOR ' + ' AFTER ';'»«a.probability»:(s'=«indexOf(a.dst.name)»)«ENDFOR»
+			[«entry.value»] s=«entry.key»«FOR p: stateMap.get(entry.key).label» & «p.name»=true«ENDFOR»«FOR Arc a: actionMap.get(entry) BEFORE ' -> ' SEPARATOR ' + ' AFTER ';'»«a.probability»:(s'=«indexOf(a.dst.name)»)«FOR p: setMinus(a.src.label, a.dst.label)» & («p.name»'=false)«ENDFOR»«FOR p: a.dst.label» & («p.name»'=true)«ENDFOR»«ENDFOR»
 		«ENDFOR»
 	'''
+		
+	def setMinus(EList<AtomicProposition> list1, EList<AtomicProposition> list2) {
+		var result = new ArrayList<AtomicProposition>
+		for(AtomicProposition p: list1) {
+			if(!list2.contains(p))
+				result.add(p)
+		}
+		return result
+	}
 	
 	def createActionMap(Iterable<Arc> arcs) {
 		var actionMap = new HashMap<SimpleEntry<Integer, String>, ArrayList<Arc>>
@@ -88,6 +106,13 @@ class MdpDslGenerator extends AbstractGenerator {
 			}
 		}
 		return actionMap
+	}
+	
+	def createStateMap(Iterable<State> states) {
+		var map = new HashMap<Integer, State>
+		for(State s: states)
+			map.put(indexOf(s.name), s)
+		return map
 	}
 	
 	def HashMap<String, Integer> createStateMapping(Iterable<State> states) {
