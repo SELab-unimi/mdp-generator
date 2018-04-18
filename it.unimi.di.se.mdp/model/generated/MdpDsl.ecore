@@ -15,6 +15,8 @@
         eType="#//ControllableMap" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="resetActions" upperBound="-1"
         eType="#//ResetEvent" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="sampleSize" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="policy" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Action">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
@@ -52,18 +54,12 @@
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="ObservableMap">
     <eStructuralFeatures xsi:type="ecore:EReference" name="arc" eType="#//Arc"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="when" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="signature" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="Arguments" upperBound="-1"
         eType="#//Arg" containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="argsCondition" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="precondition" eType="#//Precondition"
-        containment="true"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="postcondition" eType="#//Postcondition"
         containment="true"/>
-  </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Precondition">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="expression" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Postcondition">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="expression" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>

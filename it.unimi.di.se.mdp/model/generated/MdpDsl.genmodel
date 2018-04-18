@@ -14,6 +14,8 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//MDPModel/observableActions"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//MDPModel/controllableActions"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//MDPModel/resetActions"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//MDPModel/sampleSize"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//MDPModel/policy"/>
     </genClasses>
     <genClasses ecoreClass="MdpDsl.ecore#//Action">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//Action/name"/>
@@ -48,15 +50,10 @@
     </genClasses>
     <genClasses ecoreClass="MdpDsl.ecore#//ObservableMap">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//ObservableMap/arc"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//ObservableMap/when"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//ObservableMap/signature"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//ObservableMap/Arguments"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//ObservableMap/argsCondition"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//ObservableMap/precondition"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//ObservableMap/postcondition"/>
-    </genClasses>
-    <genClasses ecoreClass="MdpDsl.ecore#//Precondition">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//Precondition/expression"/>
     </genClasses>
     <genClasses ecoreClass="MdpDsl.ecore#//Postcondition">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//Postcondition/expression"/>

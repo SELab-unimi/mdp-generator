@@ -42,7 +42,7 @@ class MdpDslGenerator extends AbstractGenerator {
 		parseObserveMappings(resource.allContents.toIterable.filter(typeof(ObservableMap)))
 		parseControlMappings(resource.allContents.toIterable.filter(typeof(ControllableMap)))
 		parseResetEvents(resource.allContents.toIterable.filter(typeof(ResetEvent)))
-		fsa.generateFile("it/unimi/di/se/monitor/EventHandler.aj", resource.compileEventHandler)	
+		fsa.generateFile("it/unimi/di/se/monitor/EventHandler.aj", resource.compileEventHandler(model.sampleSize, model.policy))	
 	}
 	
 	def compilePrismModel(Resource resource) '''
@@ -130,7 +130,7 @@ class MdpDslGenerator extends AbstractGenerator {
 		«ENDFOR»
 	'''
 	
-	def compileEventHandler(Resource resource) '''
+	def compileEventHandler(Resource resource, int sampleSize, String policy) '''
 		package it.unimi.di.se.monitor;
 		
 		import org.slf4j.Logger;
@@ -164,6 +164,9 @@ class MdpDslGenerator extends AbstractGenerator {
 		    private static final Logger log = LoggerFactory.getLogger(EventHandler.class.getName());
 		    static final String MODEL_PATH = "src/main/resources/«resource.URI.lastSegment»";
 		    static private final String JMDP_MODEL_PATH = "src/main/resources/«resource.URI.lastSegment.split("\\.").get(0)».jmdp";
+		    
+		    static final int SAMPLE_SIZE = «IF sampleSize > 0»«sampleSize»«ELSE»2000«ENDIF»;
+		    static final Monitor.Policy policy = Monitor.Policy.«IF policy == 'random'»RANDOM«ELSEIF policy == 'history'»HISTORY«ELSE»UNCERTAINTY«ENDIF»;
 		    
 		    private Monitor monitor = null;
 		    private SimpleMDP mdp = null;

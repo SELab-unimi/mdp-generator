@@ -9,7 +9,9 @@ MDPModel:
     'arcs' arcs += Arc*
     'observe' observableActions += ObservableMap*
     'control' controllableActions += ControllableMap*
-    'reset' resetActions += ResetEvent*;
+    'reset' resetActions += ResetEvent*
+    ('sampleSize' sampleSize=INT)?
+    ('explorationPolicy' policy=Policy)?;
   
 Action:
 	name=ID;  
@@ -33,21 +35,18 @@ Arg:
 	name=ID ':' type=STRING;
 
 ObservableMap:
-	arc=[Arc] '->' when=When signature=STRING (',' 'args' '{' Arguments += Arg+ '}')? (',' 'argsCondition' argsCondition=STRING)? (',' precondition=Precondition)? (',' postcondition=Postcondition)?;
-	
-Precondition:
-	'precondition' expression=STRING;
+	arc=[Arc] '->' signature=STRING ',' 'args' '{' Arguments += Arg+ '}' ',' 'precondition' argsCondition=STRING ',' postcondition=Postcondition;
 	
 Postcondition:
-	'postcondition' expression=STRING 'returnType' returnType=ID;
-
-When:
-	'before' | 'after';
+	'postcondition' expression=STRING 'returnType' returnType=STRING;
 
 ControllableMap:
-	state=[State] '->' signature=STRING ',' 'args' '{' Arguments += Arg+ '}'; // it assumes presence the of one java.io.InputStream argument
+	state=[State] '->' signature=STRING ',' 'args' '{' Arguments += Arg+ '}'; // it assumes the presence of a single java.io.InputStream argument
 
 ResetEvent:
 	signature=STRING (',' 'args' '{' Arguments += Arg+ '}')? (',' 'argsCondition' argsCondition=STRING)?;
+
+Policy:
+	'uncertainty' | 'random' | 'history';
 
 terminal DECIMAL: INT '.' INT;
