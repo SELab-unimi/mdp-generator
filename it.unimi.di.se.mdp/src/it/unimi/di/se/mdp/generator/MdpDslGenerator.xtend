@@ -137,12 +137,8 @@ class MdpDslGenerator extends AbstractGenerator {
 		import org.slf4j.LoggerFactory;
 		
 		import it.unimi.di.se.monitor.Monitor.CheckPoint;
-		import jmarkov.basic.DecisionRule;
-		import jmarkov.basic.exceptions.SolverException;
 		import jmarkov.jmdp.CharAction;
-		import jmarkov.jmdp.IntegerState;
 		import jmarkov.jmdp.SimpleMDP;
-		import jmarkov.jmdp.solvers.ProbabilitySolver;
 		
 		import java.io.BufferedReader;
 		import java.io.ByteArrayInputStream;
@@ -166,11 +162,10 @@ class MdpDslGenerator extends AbstractGenerator {
 		    static private final String JMDP_MODEL_PATH = "src/main/resources/«resource.URI.lastSegment.split("\\.").get(0)».jmdp";
 		    
 		    static final int SAMPLE_SIZE = «IF sampleSize > 0»«sampleSize»«ELSE»2000«ENDIF»;
-		    static final Monitor.Policy policy = Monitor.Policy.«IF policy == 'random'»RANDOM«ELSEIF policy == 'history'»HISTORY«ELSE»UNCERTAINTY«ENDIF»;
 		    
 		    private Monitor monitor = null;
 		    private SimpleMDP mdp = null;
-		    private DecisionRule<IntegerState, CharAction> decisionRule = null;
+		    private DecisionMaker decisionMaker= null;
 		    
 		    @Pointcut("execution(public static void main(..))")
 		    void mainMethod() {}
@@ -178,18 +173,15 @@ class MdpDslGenerator extends AbstractGenerator {
 		    @Before(value="mainMethod()")
 		    public void initMonitor() {
 		    		log.info("MDP Policy computation...");
-				try {
-					mdp = new SimpleMDP(new BufferedReader(new FileReader(JMDP_MODEL_PATH)));
-					mdp.printSolution();
-					decisionRule = mdp.getOptimalPolicy().getDecisionRule();
-					ProbabilitySolver<IntegerState, CharAction> solver = new ProbabilitySolver<>(mdp, decisionRule);
-					solver.solve();
-				} catch (FileNotFoundException|SolverException e) {
-					e.printStackTrace();
-				}
-		    		log.info("Monitor initialization...");
-		    		monitor = new Monitor();
-		    		monitor.launch();
+		   		try {
+		   			mdp = new SimpleMDP(new BufferedReader(new FileReader(JMDP_MODEL_PATH)));
+		   		} catch (FileNotFoundException e) {
+		   			e.printStackTrace();
+		   		}
+		   		decisionMaker = new DecisionMaker(mdp, DecisionMaker.Policy.«IF policy == 'random'»RANDOM«ELSEIF policy == 'history'»HISTORY«ELSE»UNCERTAINTY«ENDIF»);
+		       	log.info("Monitor initialization...");
+		       	monitor = new Monitor();
+		       	monitor.launch();
 			}
 		        
 		    @After(value="mainMethod()")
@@ -202,7 +194,7 @@ class MdpDslGenerator extends AbstractGenerator {
 				monitor.addEvent(Event.readStateEvent());
 				String stateName = CheckPoint.getInstance().join(Thread.currentThread());
 				
-				CharAction action = decisionRule.getAction(new IntegerState(Integer.parseInt(stateName.substring(1))));		
+				CharAction action = decisionMaker.getAction(Integer.parseInt(stateName.substring(1)));
 				log.info("Selected action = " + action.actionLabel());	
 				return String.valueOf(action.actionLabel());
 			}
