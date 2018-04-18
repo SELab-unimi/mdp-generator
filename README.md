@@ -1,7 +1,7 @@
 # MDP Compiler
 
 This project contains a `MDP compiler` written in [Xtext/Xtend](https://www.eclipse.org/Xtext/).
-Given as input the description of a SUT as a Markov Decision Process, the compiler 
+Given as input the description of a SUT as a Markov Decision Process, the compiler
 automatically generates the monitor instrumentation and the input files for the [monitored-mdp-simulator](https://github.com/SELab-unimi/mdp-simulator-monitored).
 
 ## How do I get set up?
@@ -11,56 +11,82 @@ You can import it inside the Eclipse IDE by using `Gradle`.
 
 ### Simple exmaple
 
-The following input shows a simple MDP example written by using the `mdpDsl` language:
+The following input shows a MDP example written by using the `mdpDsl` language:
 
 ```
-model "simple-mdp"
+model "tas-model"
 actions
-	w a b
+	w s b v a c
 states
-	S0 {empty} initial
-	S1 {}
-	S2 {}
-	S3 {full}
-	S4 {}
-	S5 {} Dir~(w, <S3, 0.8> <S0, 0.2>)
+	S0  {} initial
+	S1  {stop}
+	S2  {alarm} Dir~(a, <S3, 0.5> <S4, 0.5>)
+	S3  {full}
+	S4  {}
+	S5  {}
+	S6  {}
+	S7  {fast}
+	S8  {slow}
+	S9  {}
+	S10 {success}
+
 arcs
-	a0 : (S0, a) -> S1, 0.1
-	a1 : (S0, a) -> S5, 0.9
-	a2 : (S0, b) -> S2, 1.0
-	a3 : (S1, a) -> S3, 1.0
-	a4 : (S1, b) -> S4, 1.0
-	a5 : (S5, w) -> S3, 0.8
-	a9 : (S5, w) -> S0, 0.2
-	a6 : (S2, w) -> S2, 1.0
-	a7 : (S4, w) -> S4, 1.0
-	a8 : (S3, w) -> S3, 1.0
-observe 
-	a0 -> after "private void it.unimi.di.se.simulator.MDPSimulator.doTransition(..)", args {state:"jmarkov.jmdp.IntegerState"}, argsCondition "state.label().equals(\"S1\")"
-	a1 -> after "private void it.unimi.di.se.simulator.MDPSimulator.doTransition(..)", args {state:"jmarkov.jmdp.IntegerState"}, argsCondition "state.label().equals(\"S5\")"
-	a2 -> after "private void it.unimi.di.se.simulator.MDPSimulator.doTransition(..)", args {state:"jmarkov.jmdp.IntegerState"}, argsCondition "state.label().equals(\"S2\")"
-	a3 -> after "private void it.unimi.di.se.simulator.MDPSimulator.doTransition(..)", args {state:"jmarkov.jmdp.IntegerState"}, argsCondition "state.label().equals(\"S3\")", precondition "state != null"
-	a4 -> after "private void it.unimi.di.se.simulator.MDPSimulator.doTransition(..)", args {state:"jmarkov.jmdp.IntegerState"}, argsCondition "state.label().equals(\"S4\")"
-	a5 -> after "private void it.unimi.di.se.simulator.MDPSimulator.doTransition(..)", args {state:"jmarkov.jmdp.IntegerState"}, argsCondition "state.label().equals(\"S3\")"
-	a6 -> after "private void it.unimi.di.se.simulator.MDPSimulator.doTransition(..)", args {state:"jmarkov.jmdp.IntegerState"}, argsCondition "state.label().equals(\"S2\")"
-	a7 -> after "private void it.unimi.di.se.simulator.MDPSimulator.doTransition(..)", args {state:"jmarkov.jmdp.IntegerState"}, argsCondition "state.label().equals(\"S4\")"
-	a8 -> after "private void it.unimi.di.se.simulator.MDPSimulator.doTransition(..)", args {state:"jmarkov.jmdp.IntegerState"}, argsCondition "state.label().equals(\"S3\")"
-	a9 -> after "private void it.unimi.di.se.simulator.MDPSimulator.doTransition(..)", args {state:"jmarkov.jmdp.IntegerState"}, argsCondition "state.label().equals(\"S0\")"
+	a0  : (S0, s) -> S1, 1.0
+	a1  : (S1, w) -> S1, 1.0
+	a2  : (S0, b) -> S2, 1.0
+	a3  : (S2, a) -> S3, 0.5
+	a4  : (S2, a) -> S4, 0.5
+	a5  : (S4, w) -> S2, 1.0
+	a6  : (S3, w) -> S10, 1.0
+	a7  : (S0, v) -> S5, 1.0
+	a8  : (S5, b) -> S2, 1.0
+	a9  : (S5, c) -> S6, 1.0
+	a10 : (S6, w) -> S7, 0.5
+	a11 : (S6, w) -> S8, 0.3
+	a12 : (S6, w) -> S9, 0.2
+	a13 : (S7, w) -> S10, 1.0
+	a14 : (S8, w) -> S10, 1.0
+	a15 : (S9, w) -> S5, 1.0
+	a16 : (S10, w) -> S10, 1.0
+
+observe
+	a0  -> "public jmarkov.jmdp.IntegerState it.unimi.di.se.simulator.MDPSimulator.doAction(..)", args {state:"jmarkov.jmdp.IntegerState" action:"char"}, precondition "state.label().equals(\"S0\") && action=='s'", postcondition "result.label().equals(\"S1\")" returnType "jmarkov.jmdp.IntegerState"
+	a1  -> "public jmarkov.jmdp.IntegerState it.unimi.di.se.simulator.MDPSimulator.doAction(..)", args {state:"jmarkov.jmdp.IntegerState" action:"char"}, precondition "state.label().equals(\"S1\") && action=='w'", postcondition "result.label().equals(\"S1\")" returnType "jmarkov.jmdp.IntegerState"
+	a2  -> "public jmarkov.jmdp.IntegerState it.unimi.di.se.simulator.MDPSimulator.doAction(..)", args {state:"jmarkov.jmdp.IntegerState" action:"char"}, precondition "state.label().equals(\"S0\") && action=='b'", postcondition "result.label().equals(\"S2\")" returnType "jmarkov.jmdp.IntegerState"
+	a3  -> "public jmarkov.jmdp.IntegerState it.unimi.di.se.simulator.MDPSimulator.doAction(..)", args {state:"jmarkov.jmdp.IntegerState" action:"char"}, precondition "state.label().equals(\"S2\") && action=='a'", postcondition "result.label().equals(\"S3\")" returnType "jmarkov.jmdp.IntegerState"
+	a4  -> "public jmarkov.jmdp.IntegerState it.unimi.di.se.simulator.MDPSimulator.doAction(..)", args {state:"jmarkov.jmdp.IntegerState" action:"char"}, precondition "state.label().equals(\"S2\") && action=='a'", postcondition "result.label().equals(\"S4\")" returnType "jmarkov.jmdp.IntegerState"
+	a5  -> "public jmarkov.jmdp.IntegerState it.unimi.di.se.simulator.MDPSimulator.doAction(..)", args {state:"jmarkov.jmdp.IntegerState" action:"char"}, precondition "state.label().equals(\"S4\") && action=='w'", postcondition "result.label().equals(\"S2\")" returnType "jmarkov.jmdp.IntegerState"
+	a6  -> "public jmarkov.jmdp.IntegerState it.unimi.di.se.simulator.MDPSimulator.doAction(..)", args {state:"jmarkov.jmdp.IntegerState" action:"char"}, precondition "state.label().equals(\"S3\") && action=='w'", postcondition "result.label().equals(\"S10\")" returnType "jmarkov.jmdp.IntegerState"
+	a7  -> "public jmarkov.jmdp.IntegerState it.unimi.di.se.simulator.MDPSimulator.doAction(..)", args {state:"jmarkov.jmdp.IntegerState" action:"char"}, precondition "state.label().equals(\"S0\") && action=='v'", postcondition "result.label().equals(\"S5\")" returnType "jmarkov.jmdp.IntegerState"
+	a8  -> "public jmarkov.jmdp.IntegerState it.unimi.di.se.simulator.MDPSimulator.doAction(..)", args {state:"jmarkov.jmdp.IntegerState" action:"char"}, precondition "state.label().equals(\"S5\") && action=='b'", postcondition "result.label().equals(\"S2\")" returnType "jmarkov.jmdp.IntegerState"
+	a9  -> "public jmarkov.jmdp.IntegerState it.unimi.di.se.simulator.MDPSimulator.doAction(..)", args {state:"jmarkov.jmdp.IntegerState" action:"char"}, precondition "state.label().equals(\"S5\") && action=='c'", postcondition "result.label().equals(\"S6\")" returnType "jmarkov.jmdp.IntegerState"
+	a10 -> "public jmarkov.jmdp.IntegerState it.unimi.di.se.simulator.MDPSimulator.doAction(..)", args {state:"jmarkov.jmdp.IntegerState" action:"char"}, precondition "state.label().equals(\"S6\") && action=='w'", postcondition "result.label().equals(\"S7\")" returnType "jmarkov.jmdp.IntegerState"
+	a11 -> "public jmarkov.jmdp.IntegerState it.unimi.di.se.simulator.MDPSimulator.doAction(..)", args {state:"jmarkov.jmdp.IntegerState" action:"char"}, precondition "state.label().equals(\"S6\") && action=='w'", postcondition "result.label().equals(\"S8\")" returnType "jmarkov.jmdp.IntegerState"
+	a12 -> "public jmarkov.jmdp.IntegerState it.unimi.di.se.simulator.MDPSimulator.doAction(..)", args {state:"jmarkov.jmdp.IntegerState" action:"char"}, precondition "state.label().equals(\"S6\") && action=='w'", postcondition "result.label().equals(\"S9\")" returnType "jmarkov.jmdp.IntegerState"
+	a13 -> "public jmarkov.jmdp.IntegerState it.unimi.di.se.simulator.MDPSimulator.doAction(..)", args {state:"jmarkov.jmdp.IntegerState" action:"char"}, precondition "state.label().equals(\"S7\") && action=='w'", postcondition "result.label().equals(\"S10\")" returnType "jmarkov.jmdp.IntegerState"
+	a14 -> "public jmarkov.jmdp.IntegerState it.unimi.di.se.simulator.MDPSimulator.doAction(..)", args {state:"jmarkov.jmdp.IntegerState" action:"char"}, precondition "state.label().equals(\"S8\") && action=='w'", postcondition "result.label().equals(\"S10\")" returnType "jmarkov.jmdp.IntegerState"
+	a15 -> "public jmarkov.jmdp.IntegerState it.unimi.di.se.simulator.MDPSimulator.doAction(..)", args {state:"jmarkov.jmdp.IntegerState" action:"char"}, precondition "state.label().equals(\"S9\") && action=='w'", postcondition "result.label().equals(\"S5\")" returnType "jmarkov.jmdp.IntegerState"
+	a16 -> "public jmarkov.jmdp.IntegerState it.unimi.di.se.simulator.MDPSimulator.doAction(..)", args {state:"jmarkov.jmdp.IntegerState" action:"char"}, precondition "state.label().equals(\"S10\") && action=='w'", postcondition "result.label().equals(\"S10\")" returnType "jmarkov.jmdp.IntegerState"
+
 control
 	S0 -> "private char it.unimi.di.se.simulator.MDPDriver.waitForAction(..)", args {actionList:"jmarkov.basic.Actions<jmarkov.jmdp.CharAction>" input:"java.io.InputStream"}
-	S1 -> "private char it.unimi.di.se.simulator.MDPDriver.waitForAction(..)", args {actionList:"jmarkov.basic.Actions<jmarkov.jmdp.CharAction>" input:"java.io.InputStream"}
+	S2 -> "private char it.unimi.di.se.simulator.MDPDriver.waitForAction(..)", args {actionList:"jmarkov.basic.Actions<jmarkov.jmdp.CharAction>" input:"java.io.InputStream"}
+	S5 -> "private char it.unimi.di.se.simulator.MDPDriver.waitForAction(..)", args {actionList:"jmarkov.basic.Actions<jmarkov.jmdp.CharAction>" input:"java.io.InputStream"}
 reset
 	"public void it.unimi.di.se.simulator.MDPSimulator.resetSimulation(..)"
+
+sampleSize 2000
+explorationPolicy uncertainty
 ```
 
-This example shows how to define *actions*, *states*, *arcs* (i.e., the MDP model) and how to connect them to 
-the SUT (i.e., the [monitored-mdp-simulator](https://github.com/SELab-unimi/mdp-simulator-monitored)) 
+This example shows how to define *actions*, *states*, *arcs* (i.e., the MDP model) and how to connect them to
+the SUT (i.e., the [monitored-mdp-simulator](https://github.com/SELab-unimi/mdp-simulator-monitored))
 by defining *observable*/*controllable* actions.
 
 Observable actions allow to link arcs of the model to the execution of specific methods of the SUT.
 Controllable actions allow to control the arguments of specific methods depending on the *uncertainty-based exploration policy*.
 
-Given a `.mdp` file, the The `MDP Compiler` generates: 
+Given a `.mdp` file, the The `MDP Compiler` generates:
 
 *    the *Monitor instrumentation* (i.e., the `EventHandler.aj` file);
 *    the [MDP simulator](https://github.com/SELab-unimi/mdp-simulator-monitored) input file (i.e., the `sut.jmdp` file);
