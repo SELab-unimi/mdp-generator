@@ -26,7 +26,7 @@ actions
 states
 	S0  {} initial
 	S1  {stop}
-	S2  {alarm} Dir~(a, <S3, 300> <S4, 200>)
+	S2  {alarm} Dir~(a, <S3, 300.0> <S4, 200.0>)
 	S3  {full}
 	S4  {}
 	S5  {}

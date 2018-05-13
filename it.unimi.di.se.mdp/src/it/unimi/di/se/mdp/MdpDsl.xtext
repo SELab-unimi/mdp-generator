@@ -11,7 +11,8 @@ MDPModel:
     'control' controllableActions += ControllableMap*
     'reset' resetActions += ResetEvent*
     ('sampleSize' sampleSize=INT)?
-    ('explorationPolicy' policy=Policy)?;
+    ('explorationPolicy' policy=Policy 'termination' termination=Termination)?
+    (coverage=DECIMAL)?;
   
 Action:
 	name=ID;  
@@ -48,5 +49,8 @@ ResetEvent:
 
 Policy:
 	'uncertainty' | 'random' | 'history';
+	
+Termination:
+	'convergence' | 'coverage';
 
 terminal DECIMAL: INT '.' INT;

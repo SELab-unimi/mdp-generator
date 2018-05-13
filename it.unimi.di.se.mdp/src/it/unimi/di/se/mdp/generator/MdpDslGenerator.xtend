@@ -42,7 +42,10 @@ class MdpDslGenerator extends AbstractGenerator {
 		parseObserveMappings(resource.allContents.toIterable.filter(typeof(ObservableMap)))
 		parseControlMappings(resource.allContents.toIterable.filter(typeof(ControllableMap)))
 		parseResetEvents(resource.allContents.toIterable.filter(typeof(ResetEvent)))
-		fsa.generateFile("it/unimi/di/se/monitor/EventHandler.aj", resource.compileEventHandler(model.sampleSize, model.policy))	
+		var coverage = 1.0;
+		if(model.coverage !== null)
+			coverage = Double.parseDouble(model.coverage)
+		fsa.generateFile("it/unimi/di/se/monitor/EventHandler.aj", resource.compileEventHandler(model.sampleSize, model.policy, model.termination, coverage))	
 	}
 	
 	def compilePrismModel(Resource resource) '''
@@ -130,7 +133,7 @@ class MdpDslGenerator extends AbstractGenerator {
 		«ENDFOR»
 	'''
 	
-	def compileEventHandler(Resource resource, int sampleSize, String policy) '''
+	def compileEventHandler(Resource resource, int sampleSize, String policy, String termination, double coverage) '''
 		package it.unimi.di.se.monitor;
 		
 		import org.slf4j.Logger;
@@ -162,6 +165,8 @@ class MdpDslGenerator extends AbstractGenerator {
 		    static private final String JMDP_MODEL_PATH = "src/main/resources/«resource.URI.lastSegment.split("\\.").get(0)».jmdp";
 		    
 		    static final int SAMPLE_SIZE = «IF sampleSize > 0»«sampleSize»«ELSE»2000«ENDIF»;
+		    static final Monitor.Termination TERMINATION_CONDITION = Monitor.Termination.«IF termination == 'coverage'»COVERAGE«ELSE»CONVERGENCE«ENDIF»;
+		    static final double COVERAGE = «coverage»;
 		    
 		    private Monitor monitor = null;
 		    private SimpleMDP mdp = null;
