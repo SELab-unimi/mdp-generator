@@ -185,7 +185,7 @@ class MdpDslGenerator extends AbstractGenerator {
 		   		}
 		   		decisionMaker = new DecisionMaker(mdp, DecisionMaker.Policy.«IF policy == 'random'»RANDOM«ELSEIF policy == 'history'»HISTORY«ELSE»UNCERTAINTY«ENDIF»);
 		       	log.info("Monitor initialization...");
-		       	monitor = new Monitor();
+		       	monitor = Monitor.getInstance();
 		       	monitor.launch();
 			}
 		        
