@@ -38,6 +38,9 @@ class AfterCompiler extends ObservableActionCompiler {
 				
 				«signature.compileEvents»
 				«compilePostconditions(POSTCONDITION_MSG)»
+				
+				monitor.addEvent(Event.readStateEvent());
+				CheckPoint.getInstance().join(Thread.currentThread());
 			}
 		«ENDIF»
 	'''
