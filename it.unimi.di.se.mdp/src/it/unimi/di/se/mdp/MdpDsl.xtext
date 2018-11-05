@@ -15,7 +15,7 @@ MDPModel:
     (coverage=DECIMAL)?;
   
 Action:
-	name=ID;  
+	name=ID '->' actionName=ActionName '(' actionArgs += STRING* ')';
 
 State: // state naming convention is S<n>, n>=0
 	name=ID '{' Label += AtomicProposition* '}' initial?=('initial')? Prior += DirichletPrior*;
@@ -46,6 +46,9 @@ ControllableMap:
 
 ResetEvent:
 	signature=STRING (',' 'args' '{' Arguments += Arg+ '}')? (',' 'argsCondition' argsCondition=STRING)?;
+
+ActionName:
+	'GET' | 'CLICK' | 'NONE';
 
 Policy:
 	'uncertainty' | 'random' | 'history';

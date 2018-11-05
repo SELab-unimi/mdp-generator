@@ -21,6 +21,8 @@
     </genClasses>
     <genClasses ecoreClass="MdpDsl.ecore#//Action">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//Action/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//Action/actionName"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//Action/actionArgs"/>
     </genClasses>
     <genClasses ecoreClass="MdpDsl.ecore#//State">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//State/name"/>

@@ -21,6 +21,7 @@ import java.util.AbstractMap.SimpleEntry
 import org.eclipse.emf.common.util.EList
 import it.unimi.di.se.mdp.mdpDsl.AtomicProposition
 import java.util.Iterator
+import it.unimi.di.se.mdp.mdpDsl.Action
 
 /**
  * Generates code from your model files on save.
@@ -147,6 +148,9 @@ class MdpDslGenerator extends AbstractGenerator {
 		import java.io.ByteArrayInputStream;
 		import java.io.FileNotFoundException;
 		import java.io.FileReader;
+		import java.util.AbstractMap;
+		import java.util.HashMap;
+		import java.util.Map;
 		
 		import org.aspectj.lang.ProceedingJoinPoint;
 		import org.aspectj.lang.annotation.After;
@@ -167,6 +171,13 @@ class MdpDslGenerator extends AbstractGenerator {
 		    static final int SAMPLE_SIZE = «IF sampleSize > 0»«sampleSize»«ELSE»2000«ENDIF»;
 		    static final Monitor.Termination TERMINATION_CONDITION = Monitor.Termination.«IF termination == 'coverage'»COVERAGE«ELSE»CONVERGENCE«ENDIF»;
 		    static final double COVERAGE = «coverage»;
+		    
+		     public static final Map<Character, Map.Entry<String, String[]>> actionMap = new HashMap<>();
+		    static {
+		    		«FOR action: resource.allContents.toIterable.filter(typeof(Action))»
+		    		actionMap.put('«action.name»', new AbstractMap.SimpleEntry<>("«action.actionName»", new String[]{«FOR arg: action.actionArgs SEPARATOR ','»"«arg»"«ENDFOR»}));
+		    		«ENDFOR»
+		    	}
 		    
 		    private Monitor monitor = null;
 		    private SimpleMDP mdp = null;
