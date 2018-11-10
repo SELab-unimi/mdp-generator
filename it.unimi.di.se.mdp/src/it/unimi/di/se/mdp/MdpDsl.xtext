@@ -48,7 +48,7 @@ ResetEvent:
 	signature=STRING (',' 'args' '{' Arguments += Arg+ '}')? (',' 'argsCondition' argsCondition=STRING)?;
 
 ActionName:
-	'GET' | 'CLICK' | 'NONE';
+	'GET' | 'CLICK' | 'TEXT' | 'SUBMIT' | 'LOGIN' | 'NONE';
 
 Policy:
 	'uncertainty' | 'random' | 'history';
