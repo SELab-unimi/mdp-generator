@@ -20,7 +20,6 @@ import java.util.List
 import java.util.AbstractMap.SimpleEntry
 import org.eclipse.emf.common.util.EList
 import it.unimi.di.se.mdp.mdpDsl.AtomicProposition
-import java.util.Iterator
 
 /**
  * Generates code from your model files on save.
@@ -43,9 +42,9 @@ class MdpDslGenerator extends AbstractGenerator {
 		parseControlMappings(resource.allContents.toIterable.filter(typeof(ControllableMap)))
 		parseResetEvents(resource.allContents.toIterable.filter(typeof(ResetEvent)))
 		var coverage = 1.0;
-		if(model.coverage !== null)
-			coverage = Double.parseDouble(model.coverage)
-		fsa.generateFile("it/unimi/di/se/monitor/EventHandler.aj", resource.compileEventHandler(model.sampleSize, model.policy, model.termination, coverage))	
+		if(model.termination.coverage !== null)
+			coverage = Double.parseDouble(model.termination.coverage)
+		fsa.generateFile("it/unimi/di/se/monitor/EventHandler.aj", resource.compileEventHandler(model.sampleSize, model.policy, model.termination.type, coverage, model.termination.limit))	
 	}
 	
 	def compilePrismModel(Resource resource) '''
@@ -133,7 +132,7 @@ class MdpDslGenerator extends AbstractGenerator {
 		«ENDFOR»
 	'''
 	
-	def compileEventHandler(Resource resource, int sampleSize, String policy, String termination, double coverage) '''
+	def compileEventHandler(Resource resource, int sampleSize, String policy, String termination, double coverage, int limit) '''
 		package it.unimi.di.se.monitor;
 		
 		import org.slf4j.Logger;
@@ -165,8 +164,9 @@ class MdpDslGenerator extends AbstractGenerator {
 		    static private final String JMDP_MODEL_PATH = "src/main/resources/«resource.URI.lastSegment.split("\\.").get(0)».jmdp";
 		    
 		    static final int SAMPLE_SIZE = «IF sampleSize > 0»«sampleSize»«ELSE»2000«ENDIF»;
-		    static final Monitor.Termination TERMINATION_CONDITION = Monitor.Termination.«IF termination == 'coverage'»COVERAGE«ELSE»CONVERGENCE«ENDIF»;
+		    static final Monitor.Termination TERMINATION_CONDITION = Monitor.Termination.«IF termination == 'coverage'»COVERAGE«ELSEIF termination == 'convergence'»CONVERGENCE«ELSEIF termination == 'limit'»LIMIT«ENDIF»;
 		    static final double COVERAGE = «coverage»;
+		    static final double LIMIT = «limit»;
 		    
 		    private Monitor monitor = null;
 		    private SimpleMDP mdp = null;

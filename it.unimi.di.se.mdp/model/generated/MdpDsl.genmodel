@@ -16,8 +16,7 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//MDPModel/resetActions"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//MDPModel/sampleSize"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//MDPModel/policy"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//MDPModel/termination"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//MDPModel/coverage"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//MDPModel/termination"/>
     </genClasses>
     <genClasses ecoreClass="MdpDsl.ecore#//Action">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//Action/name"/>
@@ -70,6 +69,11 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//ResetEvent/signature"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//ResetEvent/Arguments"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//ResetEvent/argsCondition"/>
+    </genClasses>
+    <genClasses ecoreClass="MdpDsl.ecore#//Termination">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//Termination/type"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//Termination/coverage"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//Termination/limit"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>
