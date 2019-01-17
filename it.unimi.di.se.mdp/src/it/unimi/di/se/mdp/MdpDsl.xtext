@@ -47,7 +47,7 @@ ResetEvent:
 	signature=STRING (',' 'args' '{' Arguments += Arg+ '}')? (',' 'argsCondition' argsCondition=STRING)?;
 
 Policy:
-	'uncertainty' | 'random' | 'history';
+	'uncertainty-flat' | 'uncertainty-hist' | 'random' | 'history';
 	
 Termination:
 	type=('convergence' | 'coverage' | 'limit') (coverage=DECIMAL)? (limit=INT)?;

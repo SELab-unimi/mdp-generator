@@ -170,7 +170,6 @@ class MdpDslGenerator extends AbstractGenerator {
 		    
 		    private Monitor monitor = null;
 		    private SimpleMDP mdp = null;
-		    private DecisionMaker decisionMaker= null;
 		    
 		    @Pointcut("execution(public static void main(..))")
 		    void mainMethod() {}
@@ -183,9 +182,8 @@ class MdpDslGenerator extends AbstractGenerator {
 		   		} catch (FileNotFoundException e) {
 		   			e.printStackTrace();
 		   		}
-		   		decisionMaker = new DecisionMaker(mdp, DecisionMaker.Policy.«IF policy == 'random'»RANDOM«ELSEIF policy == 'history'»HISTORY«ELSE»UNCERTAINTY«ENDIF»);
 		       	log.info("Monitor initialization...");
-		       	monitor = new Monitor();
+		       	monitor = new Monitor(new DecisionMaker(mdp, DecisionMaker.Policy.«IF policy == 'random'»RANDOM«ELSEIF policy == 'history'»HISTORY«ELSEIF policy == 'uncertainty-flat'»UNCERTAINTY_FLAT«ELSEIF policy == 'uncertainty-hist'»UNCERTAINTY_HISTORY«ENDIF»));
 		       	monitor.launch();
 			}
 		        
@@ -199,7 +197,7 @@ class MdpDslGenerator extends AbstractGenerator {
 				monitor.addEvent(Event.readStateEvent());
 				String stateName = CheckPoint.getInstance().join(Thread.currentThread());
 				
-				CharAction action = decisionMaker.getAction(Integer.parseInt(stateName.substring(1)));
+				CharAction action = monitor.getDecisionMaker().getAction(Integer.parseInt(stateName.substring(1)));
 				log.info("Selected action = " + action.actionLabel());	
 				return String.valueOf(action.actionLabel());
 			}
