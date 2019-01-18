@@ -138,6 +138,8 @@ class MdpDslGenerator extends AbstractGenerator {
 		import org.slf4j.Logger;
 		import org.slf4j.LoggerFactory;
 		
+		import it.unimi.di.se.decision.DecisionMakerFactory;
+		import it.unimi.di.se.decision.Policy;
 		import it.unimi.di.se.monitor.Monitor.CheckPoint;
 		import jmarkov.jmdp.CharAction;
 		import jmarkov.jmdp.SimpleMDP;
@@ -183,7 +185,7 @@ class MdpDslGenerator extends AbstractGenerator {
 		   			e.printStackTrace();
 		   		}
 		       	log.info("Monitor initialization...");
-		       	monitor = new Monitor(new DecisionMaker(mdp, DecisionMaker.Policy.«IF policy == 'random'»RANDOM«ELSEIF policy == 'history'»HISTORY«ELSEIF policy == 'uncertainty-flat'»UNCERTAINTY_FLAT«ELSEIF policy == 'uncertainty-hist'»UNCERTAINTY_HISTORY«ENDIF»));
+		       	monitor = new Monitor(new DecisionMakerFactory().createPolicy(mdp, DecisionMaker.Policy.«IF policy == 'random'»RANDOM«ELSEIF policy == 'history'»HISTORY«ELSEIF policy == 'uncertainty-flat'»UNCERTAINTY_FLAT«ELSEIF policy == 'uncertainty-hist'»UNCERTAINTY_HISTORY«ENDIF»));
 		       	monitor.launch();
 			}
 		        
