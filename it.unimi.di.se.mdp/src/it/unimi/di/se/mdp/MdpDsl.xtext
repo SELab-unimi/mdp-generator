@@ -10,6 +10,7 @@ MDPModel:
     'observe' observableActions += ObservableMap*
     'control' controllableActions += ControllableMap*
     'reset' resetActions += ResetEvent*
+    'profile' profiles += Profile*
     ('sampleSize' sampleSize=INT)?
     ('explorationPolicy' policy=Policy 'termination' termination=Termination)?;
   
@@ -45,9 +46,15 @@ ControllableMap:
 
 ResetEvent:
 	signature=STRING (',' 'args' '{' Arguments += Arg+ '}')? (',' 'argsCondition' argsCondition=STRING)?;
+	
+Profile:	
+	name=ID ':' Map += ProfileMap+;
+
+ProfileMap:
+	state=[State] '->' weight=DECIMAL;
 
 Policy:
-	'uncertainty-flat' | 'uncertainty-hist' | 'random' | 'history';
+	type=('uncertainty-flat' | 'uncertainty-hist' | 'distance' | 'profile' | 'combined' | 'random' | 'history') ('name' profileName=[Profile])? ('%d' distWeight=DECIMAL '%p' profWeight=DECIMAL)?;
 	
 Termination:
 	type=('convergence' | 'coverage' | 'limit') (coverage=DECIMAL)? (limit=INT)?;

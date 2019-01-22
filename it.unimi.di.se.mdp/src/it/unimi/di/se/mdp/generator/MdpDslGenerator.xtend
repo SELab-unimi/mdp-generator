@@ -20,6 +20,8 @@ import java.util.List
 import java.util.AbstractMap.SimpleEntry
 import org.eclipse.emf.common.util.EList
 import it.unimi.di.se.mdp.mdpDsl.AtomicProposition
+import it.unimi.di.se.mdp.mdpDsl.Policy
+import it.unimi.di.se.mdp.mdpDsl.Termination
 
 /**
  * Generates code from your model files on save.
@@ -41,10 +43,7 @@ class MdpDslGenerator extends AbstractGenerator {
 		parseObserveMappings(resource.allContents.toIterable.filter(typeof(ObservableMap)))
 		parseControlMappings(resource.allContents.toIterable.filter(typeof(ControllableMap)))
 		parseResetEvents(resource.allContents.toIterable.filter(typeof(ResetEvent)))
-		var coverage = 1.0;
-		if(model.termination.coverage !== null)
-			coverage = Double.parseDouble(model.termination.coverage)
-		fsa.generateFile("it/unimi/di/se/monitor/EventHandler.aj", resource.compileEventHandler(model.sampleSize, model.policy, model.termination.type, coverage, model.termination.limit))	
+		fsa.generateFile("it/unimi/di/se/monitor/EventHandler.aj", resource.compileEventHandler(model.sampleSize, model.policy, model.termination))	
 	}
 	
 	def compilePrismModel(Resource resource) '''
@@ -132,7 +131,7 @@ class MdpDslGenerator extends AbstractGenerator {
 		«ENDFOR»
 	'''
 	
-	def compileEventHandler(Resource resource, int sampleSize, String policy, String termination, double coverage, int limit) '''
+	def compileEventHandler(Resource resource, int sampleSize, Policy policy, Termination termination) '''
 		package it.unimi.di.se.monitor;
 		
 		import org.slf4j.Logger;
@@ -166,9 +165,12 @@ class MdpDslGenerator extends AbstractGenerator {
 		    static private final String JMDP_MODEL_PATH = "src/main/resources/«resource.URI.lastSegment.split("\\.").get(0)».jmdp";
 		    
 		    static final int SAMPLE_SIZE = «IF sampleSize > 0»«sampleSize»«ELSE»2000«ENDIF»;
-		    static final Monitor.Termination TERMINATION_CONDITION = Monitor.Termination.«IF termination == 'coverage'»COVERAGE«ELSEIF termination == 'convergence'»CONVERGENCE«ELSEIF termination == 'limit'»LIMIT«ENDIF»;
-		    static final double COVERAGE = «coverage»;
-		    static final double LIMIT = «limit»;
+		    static final Monitor.Termination TERMINATION_CONDITION = Monitor.Termination.«IF termination.type == 'coverage'»COVERAGE«ELSEIF termination.type == 'convergence'»CONVERGENCE«ELSEIF termination.type == 'limit'»LIMIT«ENDIF»;
+		    static final double COVERAGE = «IF termination.coverage !== null»«termination.coverage»«ELSE»0.0«ENDIF»;
+		    static final double LIMIT = «termination.limit»;
+		    static final double DIST_WEIGHT = «IF policy.distWeight !== null»«policy.distWeight»«ELSE»0.0«ENDIF»;
+		    static final double PROF_WEIGHT = «IF policy.profWeight !== null»«policy.profWeight»«ELSE»0.0«ENDIF»;
+		    static final String PROFILE_NAME = «IF policy.profileName !== null»«policy.profileName.name»«ELSE»null«ENDIF»
 		    
 		    private Monitor monitor = null;
 		    private SimpleMDP mdp = null;
@@ -185,7 +187,7 @@ class MdpDslGenerator extends AbstractGenerator {
 		   			e.printStackTrace();
 		   		}
 		       	log.info("Monitor initialization...");
-		       	monitor = new Monitor(new DecisionMakerFactory().createPolicy(mdp, DecisionMaker.Policy.«IF policy == 'random'»RANDOM«ELSEIF policy == 'history'»HISTORY«ELSEIF policy == 'uncertainty-flat'»UNCERTAINTY_FLAT«ELSEIF policy == 'uncertainty-hist'»UNCERTAINTY_HISTORY«ENDIF»));
+		       	monitor = new Monitor(new DecisionMakerFactory().createPolicy(mdp, DecisionMaker.Policy.«IF policy.type == 'random'»RANDOM«ELSEIF policy.type == 'history'»HISTORY«ELSEIF policy.type == 'uncertainty-flat'»UNCERTAINTY_FLAT«ELSEIF policy.type == 'uncertainty-hist'»UNCERTAINTY_HISTORY«ELSEIF policy.type == 'distance'»DISTANCE«ELSEIF policy.type == 'profile'»PROFILE«ELSEIF policy.type == 'combined'»COMBINED«ENDIF»));
 		       	monitor.launch();
 			}
 		        

@@ -14,8 +14,9 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//MDPModel/observableActions"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//MDPModel/controllableActions"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//MDPModel/resetActions"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//MDPModel/profiles"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//MDPModel/sampleSize"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//MDPModel/policy"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//MDPModel/policy"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//MDPModel/termination"/>
     </genClasses>
     <genClasses ecoreClass="MdpDsl.ecore#//Action">
@@ -69,6 +70,20 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//ResetEvent/signature"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//ResetEvent/Arguments"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//ResetEvent/argsCondition"/>
+    </genClasses>
+    <genClasses ecoreClass="MdpDsl.ecore#//Profile">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//Profile/name"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//Profile/Map"/>
+    </genClasses>
+    <genClasses ecoreClass="MdpDsl.ecore#//ProfileMap">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//ProfileMap/state"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//ProfileMap/weight"/>
+    </genClasses>
+    <genClasses ecoreClass="MdpDsl.ecore#//Policy">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//Policy/type"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//Policy/profileName"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//Policy/distWeight"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//Policy/profWeight"/>
     </genClasses>
     <genClasses ecoreClass="MdpDsl.ecore#//Termination">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//Termination/type"/>
