@@ -170,7 +170,7 @@ class MdpDslGenerator extends AbstractGenerator {
 		    static final double LIMIT = «termination.limit»;
 		    static final double DIST_WEIGHT = «IF policy.distWeight !== null»«policy.distWeight»«ELSE»0.0«ENDIF»;
 		    static final double PROF_WEIGHT = «IF policy.profWeight !== null»«policy.profWeight»«ELSE»0.0«ENDIF»;
-		    static final String PROFILE_NAME = «IF policy.profileName !== null»«policy.profileName.name»«ELSE»null«ENDIF»
+		    static final String PROFILE_NAME = «IF policy.profileName !== null»"«policy.profileName.name»"«ELSE»null«ENDIF»;
 		    
 		    private Monitor monitor = null;
 		    private SimpleMDP mdp = null;
