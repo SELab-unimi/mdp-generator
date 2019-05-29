@@ -168,8 +168,8 @@ class MdpDslGenerator extends AbstractGenerator {
 		    static final Monitor.Termination TERMINATION_CONDITION = Monitor.Termination.«IF termination.type == 'coverage'»COVERAGE«ELSEIF termination.type == 'convergence'»CONVERGENCE«ELSEIF termination.type == 'limit'»LIMIT«ENDIF»;
 		    static final double COVERAGE = «IF termination.coverage !== null»«termination.coverage»«ELSE»0.0«ENDIF»;
 		    static final double LIMIT = «termination.limit»;
-		    static final double DIST_WEIGHT = «IF policy.distWeight !== null»«policy.distWeight»«ELSE»0.0«ENDIF»;
-		    static final double PROF_WEIGHT = «IF policy.profWeight !== null»«policy.profWeight»«ELSE»0.0«ENDIF»;
+		    public static final double DIST_WEIGHT = «IF policy.distWeight !== null»«policy.distWeight»«ELSE»0.0«ENDIF»;
+		    public static final double PROF_WEIGHT = «IF policy.profWeight !== null»«policy.profWeight»«ELSE»0.0«ENDIF»;
 		    static final String PROFILE_NAME = «IF policy.profileName !== null»"«policy.profileName.name»"«ELSE»null«ENDIF»;
 		    
 		    private Monitor monitor = null;
@@ -187,7 +187,7 @@ class MdpDslGenerator extends AbstractGenerator {
 		   			e.printStackTrace();
 		   		}
 		       	log.info("Monitor initialization...");
-		       	monitor = new Monitor(new DecisionMakerFactory().createPolicy(mdp, DecisionMaker.Policy.«IF policy.type == 'random'»RANDOM«ELSEIF policy.type == 'history'»HISTORY«ELSEIF policy.type == 'uncertainty-flat'»UNCERTAINTY_FLAT«ELSEIF policy.type == 'uncertainty-hist'»UNCERTAINTY_HISTORY«ELSEIF policy.type == 'distance'»DISTANCE«ELSEIF policy.type == 'profile'»PROFILE«ELSEIF policy.type == 'combined'»COMBINED«ENDIF»));
+		       	monitor = new Monitor(new DecisionMakerFactory().createPolicy(mdp, Policy.«IF policy.type == 'random'»RANDOM«ELSEIF policy.type == 'history'»HISTORY«ELSEIF policy.type == 'uncertainty-flat'»UNCERTAINTY_FLAT«ELSEIF policy.type == 'uncertainty-hist'»UNCERTAINTY_HISTORY«ELSEIF policy.type == 'distance'»DISTANCE«ELSEIF policy.type == 'profile'»PROFILE«ELSEIF policy.type == 'combined'»COMBINED«ENDIF»));
 		       	monitor.launch();
 			}
 		        
