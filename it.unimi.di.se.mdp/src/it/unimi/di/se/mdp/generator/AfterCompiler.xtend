@@ -28,6 +28,8 @@ class AfterCompiler extends ObservableActionCompiler {
 	override compileAdvice(String signature) '''
 		«IF !events.empty || !postconditions.empty»
 			
+			«signature.compileEdgeMap»
+			
 			@AfterReturning(value="execution(«signature.compileSignature»)«compileArgs»"«IF !returnType.empty», returning="result"«ENDIF»)
 			public void «signature.methodName»AfterAdvice(«adviceParameters»«IF !returnType.empty»«IF !parametersName.empty», «ENDIF»«returnType» result«ENDIF») {
 				

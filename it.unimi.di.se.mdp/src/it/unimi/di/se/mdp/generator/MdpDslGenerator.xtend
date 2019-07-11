@@ -147,6 +147,8 @@ class MdpDslGenerator extends AbstractGenerator {
 		import java.io.ByteArrayInputStream;
 		import java.io.FileNotFoundException;
 		import java.io.FileReader;
+		import java.util.Map;
+		import java.util.HashMap;
 		
 		import org.aspectj.lang.ProceedingJoinPoint;
 		import org.aspectj.lang.annotation.After;
