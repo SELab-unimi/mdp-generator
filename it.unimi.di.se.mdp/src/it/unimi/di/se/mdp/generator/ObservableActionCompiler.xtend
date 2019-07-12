@@ -50,16 +50,17 @@ abstract class ObservableActionCompiler {
 	«var i = 0»
 	«var methodCounter = 0»
 	«var closed = false»
+	«var instructionsPerMethod = 500»
     	«FOR String state: events.keySet»
     	«FOR ObservableMap m: events.get(state)»
-    	«IF i % 100 == 0»
+    	«IF i % instructionsPerMethod == 0»
     	private static void edgeMapInit«methodCounter»() {«{methodCounter++; closed = false; ""}»
     	«ENDIF»
     	«var currState = state»
     	«var currAction = m.argsCondition.split('\"').get(3)»
     	«var targetState = m.postcondition.expression.split('\"').get(1)»
     		EDGE_MAP.put("«currState + currState + currAction + targetState»", "«m.arc.name»");
-	«IF i++ % 100 == 99»
+	«IF i++ % instructionsPerMethod == (instructionsPerMethod - 1)»
 	}
 	«{closed = true; ""}»«ENDIF»
     	«ENDFOR»

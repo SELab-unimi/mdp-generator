@@ -36,7 +36,7 @@ class AfterCompiler extends ObservableActionCompiler {
 				long timeStamp = System.currentTimeMillis();
 				monitor.addEvent(Event.readStateEvent());
 				String currentMonitorState = CheckPoint.getInstance().join(Thread.currentThread());
-				log.info("Transition : " + currentMonitorState + "-->" + result.label());
+				log.debug("Transition : " + currentMonitorState + "-->" + result.label());
 				
 				«signature.compileEvents»
 				«compilePostconditions(POSTCONDITION_MSG)»

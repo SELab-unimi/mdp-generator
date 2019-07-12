@@ -43,7 +43,7 @@ class MdpDslGenerator extends AbstractGenerator {
 		parseObserveMappings(resource.allContents.toIterable.filter(typeof(ObservableMap)))
 		parseControlMappings(resource.allContents.toIterable.filter(typeof(ControllableMap)))
 		parseResetEvents(resource.allContents.toIterable.filter(typeof(ResetEvent)))
-		fsa.generateFile("it/unimi/di/se/monitor/EventHandler.aj", resource.compileEventHandler(model.sampleSize, model.policy, model.termination))	
+		fsa.generateFile("test-harness/EventHandler.aj", resource.compileEventHandler(model.sampleSize, model.policy, model.termination))	
 	}
 	
 	def compilePrismModel(Resource resource) '''
@@ -182,20 +182,20 @@ class MdpDslGenerator extends AbstractGenerator {
 		    
 		    @Before(value="mainMethod()")
 		    public void initMonitor() {
-		    		log.info("MDP Policy computation...");
+		    		log.debug("MDP Policy computation...");
 		   		try {
 		   			mdp = new SimpleMDP(new BufferedReader(new FileReader(JMDP_MODEL_PATH)));
 		   		} catch (FileNotFoundException e) {
 		   			e.printStackTrace();
 		   		}
-		       	log.info("Monitor initialization...");
+		       	log.debug("Monitor initialization...");
 		       	monitor = new Monitor(new DecisionMakerFactory().createPolicy(mdp, Policy.«IF policy.type == 'random'»RANDOM«ELSEIF policy.type == 'history'»HISTORY«ELSEIF policy.type == 'uncertainty-flat'»UNCERTAINTY_FLAT«ELSEIF policy.type == 'uncertainty-hist'»UNCERTAINTY_HISTORY«ELSEIF policy.type == 'distance'»DISTANCE«ELSEIF policy.type == 'profile'»PROFILE«ELSEIF policy.type == 'combined'»COMBINED«ENDIF»));
 		       	monitor.launch();
 			}
 		        
 		    @After(value="mainMethod()")
 		    public void shutdownMonitor(){
-		    		log.info("Shutting down Monitor...");
+		    		log.debug("Shutting down Monitor...");
 		    		monitor.addEvent(Event.stopEvent());
 			}
 			
@@ -204,7 +204,7 @@ class MdpDslGenerator extends AbstractGenerator {
 				String stateName = CheckPoint.getInstance().join(Thread.currentThread());
 				
 				StringAction action = monitor.getDecisionMaker().getAction(Integer.parseInt(stateName.substring(1)));
-				log.info("Selected action = " + action.actionLabel());	
+				log.debug("Selected action = " + action.actionLabel());	
 				return String.valueOf(action.actionLabel());
 			}
 			
@@ -237,11 +237,11 @@ class MdpDslGenerator extends AbstractGenerator {
 		public void «event.signature.methodName»ResetEvent(«adviceParameters(parametersName, parametersType)») {
 			«IF event.argsCondition !== null && !event.argsCondition.isEmpty»
 			if(«event.argsCondition») {
-				log.info("Reset initial state...");
+				log.debug("Reset initial state...");
 				monitor.addEvent(Event.resetEvent());
 			}
 			«ELSE»
-			log.info("Reset initial state...");
+			log.debug("Reset initial state...");
 			monitor.addEvent(Event.resetEvent());
 			«ENDIF»
 		}
