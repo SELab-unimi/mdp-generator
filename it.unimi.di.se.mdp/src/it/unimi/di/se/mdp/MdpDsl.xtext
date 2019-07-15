@@ -12,7 +12,8 @@ MDPModel:
     'reset' resetActions += ResetEvent*
     'profile' profiles += Profile*
     ('sampleSize' sampleSize=INT)?
-    ('explorationPolicy' policy=Policy 'termination' termination=Termination)?;
+    ('explorationPolicy' policy=Policy 'termination' termination=Termination)?
+    ('decisionRules' Rules += DecisionRule*)?;
   
 Action:
 	name=ID;  
@@ -58,5 +59,11 @@ Policy:
 	
 Termination:
 	type=('convergence' | 'coverage' | 'limit') (coverage=DECIMAL)? (limit=INT)?;
+
+DecisionRule:
+	objective=[State] '->' RuleMap += StateActionRule*;
+
+StateActionRule:
+	'(' state=[State] ',' action=[Action] ')';
 
 terminal DECIMAL: INT '.' INT;

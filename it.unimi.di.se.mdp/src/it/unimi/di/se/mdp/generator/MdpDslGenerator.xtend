@@ -189,7 +189,7 @@ class MdpDslGenerator extends AbstractGenerator {
 		   			e.printStackTrace();
 		   		}
 		       	log.debug("Monitor initialization...");
-		       	monitor = new Monitor(new DecisionMakerFactory().createPolicy(mdp, Policy.«IF policy.type == 'random'»RANDOM«ELSEIF policy.type == 'history'»HISTORY«ELSEIF policy.type == 'uncertainty-flat'»UNCERTAINTY_FLAT«ELSEIF policy.type == 'uncertainty-hist'»UNCERTAINTY_HISTORY«ELSEIF policy.type == 'distance'»DISTANCE«ELSEIF policy.type == 'profile'»PROFILE«ELSEIF policy.type == 'combined'»COMBINED«ENDIF»));
+		       	monitor = new Monitor(mdp, Policy.«IF policy.type == 'random'»RANDOM«ELSEIF policy.type == 'history'»HISTORY«ELSEIF policy.type == 'uncertainty-flat'»UNCERTAINTY_FLAT«ELSEIF policy.type == 'uncertainty-hist'»UNCERTAINTY_HISTORY«ELSEIF policy.type == 'distance'»DISTANCE«ELSEIF policy.type == 'profile'»PROFILE«ELSEIF policy.type == 'combined'»COMBINED«ENDIF»);
 		       	monitor.launch();
 			}
 		        

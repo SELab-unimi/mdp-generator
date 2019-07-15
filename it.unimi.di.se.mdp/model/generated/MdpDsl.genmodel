@@ -18,6 +18,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//MDPModel/sampleSize"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//MDPModel/policy"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//MDPModel/termination"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//MDPModel/Rules"/>
     </genClasses>
     <genClasses ecoreClass="MdpDsl.ecore#//Action">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//Action/name"/>
@@ -89,6 +90,14 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//Termination/type"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//Termination/coverage"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute MdpDsl.ecore#//Termination/limit"/>
+    </genClasses>
+    <genClasses ecoreClass="MdpDsl.ecore#//DecisionRule">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//DecisionRule/objective"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//DecisionRule/RuleMap"/>
+    </genClasses>
+    <genClasses ecoreClass="MdpDsl.ecore#//StateActionRule">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//StateActionRule/state"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference MdpDsl.ecore#//StateActionRule/action"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>
